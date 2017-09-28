@@ -20,7 +20,7 @@ fun main(args: Array<String>) {
         }
 
         fun openDoors(): List<Char> {
-            return getMd5(stem + history)
+            return md5(stem + history)
                     .take(4)
                     .map { it in "bcdef" }
                     .zip("UDLR".asIterable())

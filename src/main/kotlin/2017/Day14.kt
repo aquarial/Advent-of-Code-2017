@@ -4,7 +4,7 @@ fun main(args: Array<String>) {
     fun hasher(str: String, iters: Int): String {
         var s = str
         for (i in 1..iters) {
-            s = getMd5(s)
+            s = md5(s)
         }
         return s
     }

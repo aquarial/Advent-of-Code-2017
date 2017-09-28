@@ -7,7 +7,7 @@ fun main(args: Array<String>) {
     println(password)
     var b = BigInteger("0")
     while (true) {
-        val str = getMd5("wtnhxymk" + b.toString())
+        val str = md5("wtnhxymk" + b.toString())
         if (isInteresting(str)) {
             val index = str[5].toInt() - '0'.toInt()
             val char = str[6]
@@ -31,7 +31,7 @@ fun isInteresting(str: String): Boolean = str.take(5) == "00000"
 
 
 val md5 = MessageDigest.getInstance("MD5")!!
-fun getMd5(str: String): String {
+fun md5(str: String): String {
     md5.reset()
     md5.update(StandardCharsets.UTF_8.encode(str))
     return String.format("%032x", BigInteger(1, md5.digest()))
