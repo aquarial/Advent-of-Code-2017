@@ -1,9 +1,6 @@
-package y2016
-
-
 @file:Suppress("LoopToCallChain")
 
-import kotlin.system.exitProcess
+package y2016
 
 fun main(args: Array<String>) {
     val states = mutableListOf(State(1, listOf(1, 1, 1, 1, 1, 3, 3), listOf(1, 1, 1, 2, 2, 3, 3)))
@@ -17,7 +14,7 @@ fun main(args: Array<String>) {
         for (s in states) {
             if (s.isWin()) {
                 println(s)
-                exitProcess(0)
+                System.exit(0)
             }
             s.nextPossibleStates()
                     .filter { it.isValid() }

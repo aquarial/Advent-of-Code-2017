@@ -1,7 +1,6 @@
-package y2016
-
-
 @file:Suppress("LoopToCallChain")
+
+package y2016
 
 import java.util.*
 import kotlin.system.exitProcess
@@ -30,7 +29,7 @@ fun main(args: Array<String>) {
             }
         }
         println("Cound not find $c")
-        exitProcess(1)
+        exitProcess(0)
     }
 
     val targets = List(7 + 1, { findChar(it.toString()[0]) }).drop(1)
