@@ -1,6 +1,3 @@
-package y2016
-
-
 fun main(args: Array<String>) {
     var start = 3014603 - 3.0
 //    var start = 36 - 3.0

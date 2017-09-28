@@ -1,6 +1,3 @@
-package y2016
-
-
 fun main(args: Array<String>) {
     var count = 0
     while (true) {

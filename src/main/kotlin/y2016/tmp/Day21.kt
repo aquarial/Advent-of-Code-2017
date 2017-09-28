@@ -1,6 +1,3 @@
-package y2016
-
-
 import java.util.*
 import kotlin.system.exitProcess
 

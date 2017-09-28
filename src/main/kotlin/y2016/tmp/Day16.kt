@@ -1,6 +1,3 @@
-package y2016
-
-
 fun main(args: Array<String>) {
     var state = "11110010111001001"
     val diskSpace = 35651584

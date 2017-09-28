@@ -1,6 +1,3 @@
-package y2016
-
-
 fun main(args: Array<String>) {
     fun isGood(x: Int): Boolean {
         fun expect(shift: Int, mod: Int) = (x + shift) % mod != 0

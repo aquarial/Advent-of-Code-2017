@@ -1,6 +1,3 @@
-package y2016
-
-
 @Suppress("LiftReturnOrAssignment")
 fun main(args: Array<String>) {
 

@@ -1,6 +1,3 @@
-package y2016
-
-
 fun main(args: Array<String>) {
 
     fun charFromS(str: String): String {

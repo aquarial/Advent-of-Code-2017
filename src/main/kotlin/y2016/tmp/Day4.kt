@@ -1,6 +1,3 @@
-package y2016
-
-
 import jdk.nashorn.internal.objects.NativeArray.shift
 
 fun main(args: Array<String>) {

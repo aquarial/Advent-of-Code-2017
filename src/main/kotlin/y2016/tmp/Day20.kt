@@ -1,6 +1,3 @@
-package y2016
-
-
 fun main(args: Array<String>) {
     val readFromStdIn = mutableListOf<String>()
     while (true) {

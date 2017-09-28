@@ -1,6 +1,3 @@
-package y2016
-
-
 @file:Suppress("LoopToCallChain")
 
 import kotlin.system.exitProcess

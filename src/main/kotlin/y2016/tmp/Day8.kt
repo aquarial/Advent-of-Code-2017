@@ -1,6 +1,3 @@
-package y2016
-
-
 @Suppress("LoopToCallChain")
 class Screen(val width: Int, val height: Int) {
     val screen = mutableListOf<MutableList<Boolean>>()
