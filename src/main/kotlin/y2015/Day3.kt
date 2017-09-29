@@ -14,24 +14,16 @@ fun main(args: Array<String>) {
     val input = readLine()!!
 
     val houses = HashMap<Pos, Int>()
-    var currPosA = Pos(0, 0)
-    var currPosB = Pos(0, 0)
+    var currPos = Pos(0, 0)
 
-    houses[currPosA] = 1
+    houses[currPos] = 1
     var count = 1
 
-    val iter = input.iterator()
-    while (iter.hasNext()) {
-        currPosA = move(currPosA, iter.nextChar())
-        if (houses[currPosA] == null)
+    for (c in input) {
+        currPos = move(currPos, c)
+        if (houses[currPos] == null)
             count++
-        houses.put(currPosA, houses.getOrDefault(currPosA, 0) + 1)
-
-
-        currPosB = move(currPosB, iter.nextChar())
-        if (houses[currPosB] == null)
-            count++
-        houses.put(currPosB, houses.getOrDefault(currPosB, 0) + 1)
+        houses.put(currPos, houses.getOrDefault(currPos, 0) + 1)
 
         println(count)
     }
