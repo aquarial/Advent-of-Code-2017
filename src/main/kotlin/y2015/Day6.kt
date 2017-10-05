@@ -4,7 +4,7 @@ fun main(args: Array<String>) {
 
     val lights = MutableList(1000, {
         MutableList(1000, {
-            false
+            0
         })
     })
 
@@ -23,11 +23,11 @@ fun main(args: Array<String>) {
                 for (y in v[1]..v[3]) {
 
                     if (it.groupValues[1] == "turn on")
-                        lights[y][x] = true
+                        lights[y][x]++
                     if (it.groupValues[1] == "turn off")
-                        lights[y][x] = false
+                        lights[y][x] = Math.max(0, lights[y][x] - 1)
                     if (it.groupValues[1] == "toggle")
-                        lights[y][x] = !lights[y][x]
+                        lights[y][x] += 2
 
 
                 }
@@ -38,6 +38,6 @@ fun main(args: Array<String>) {
 
     }
 
-    println(lights.map { it.count { it } }.sum())
+    println(lights.map { it.sum() }.sum())
 
 }
