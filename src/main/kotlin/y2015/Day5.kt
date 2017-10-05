@@ -2,18 +2,32 @@ package y2015
 
 fun main(args: Array<String>) {
 
-    fun niceString(str:String): Boolean {
-        if (str.count {"aeiou".contains(it)} < 3)
-            return false
-
-        listOf("ab", "cd", "pq", "xy")
-                .filter { str.contains(it) }
-                .forEach { return false }
+    fun niceString(str: String): Boolean {
+        val oneLetter = (0..str.lastIndex - 2)
+                .any { str[it] == str[it + 2] }
 
 
-        return "abcdefghijklmnopqrstuvwxyz"
-                .map {"$it$it"}
-                .any {str.contains(it)}
+        val pairs = mutableListOf<String>()
+        val iterator = str.toList().listIterator()
+        while (iterator.hasNext()) {
+            val start = iterator.next()
+
+            if (iterator.hasNext()) {
+                val second = iterator.next()
+                pairs.add("" + start + second)
+
+                if (iterator.hasNext() && start == second && second == str[iterator.nextIndex()])
+                    iterator.next()
+
+                iterator.previous()
+            }
+        }
+
+        val pair = pairs.size != pairs.toSet().size
+
+        println(pairs)
+        println("$pair   $oneLetter")
+        return pair && oneLetter
     }
 
     var count = 0
