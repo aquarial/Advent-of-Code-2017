@@ -8,6 +8,9 @@ import           Text.Megaparsec
 import qualified Text.Megaparsec.Lexer as L
 import           Text.Megaparsec.Text  (Parser)
 
+import           Data.Hashable
+import qualified Data.HashSet          as Set
+
 data Turn  = TurnL | TurnR | NoTurn deriving (Show, Eq)
 data Instr = Instr !Turn !Integer   deriving (Show, Eq)
 
@@ -28,6 +31,20 @@ part1 = case parse instrs "Part 1" input of
           Left err -> error $ show err
           Right is -> dist $ foldl update (Position 0 0 U) is
 
+
+part2 :: Integer
+part2 = case parse instrs "Part 2" input of
+          Left err -> error $ show err
+          Right is -> dist $ walk Set.empty (Position 0 0 U) $ concatMap flatten is
+  where
+    walk s p []     = p
+    walk s p (i:is) = if Set.member p s then p
+                      else walk (Set.insert p s) (update p i) is
+
+    flatten :: Instr -> [Instr] -- flatten one large move into many small ones
+    flatten (Instr t 0) = []
+    flatten (Instr t n) = Instr t 1 : flatten (Instr NoTurn (n - 1))
+
 update :: Position -> Instr -> Position
 update pos (Instr turn dist) = newPos newDir
   where
@@ -43,6 +60,7 @@ update pos (Instr turn dist) = newPos newDir
     doturn TurnL d = pred d
     doturn TurnR L = U
     doturn TurnR d = succ d
+    doturn NoTurn d = d
 
 dist :: Position -> Integer
 dist pos = abs (_x pos) + abs (_y pos)
