@@ -8,13 +8,20 @@ import           Text.Megaparsec
 import qualified Text.Megaparsec.Lexer as L
 import           Text.Megaparsec.Text  (Parser)
 
-data Turn  = TurnL | TurnR        deriving (Show, Eq)
-data Instr = Instr !Turn !Integer deriving (Show, Eq)
+data Turn  = TurnL | TurnR | NoTurn deriving (Show, Eq)
+data Instr = Instr !Turn !Integer   deriving (Show, Eq)
 
 data Direction = U | R | D | L   deriving (Show, Eq, Enum)
 data Position = Position { _x :: !Integer
                          , _y :: !Integer
                          , _d :: !Direction } deriving (Show)
+
+instance Eq Position where
+  p1 == p2 = _x p1 == _x p2 && _y p1 == _y p2
+
+instance Hashable Position where
+  hashWithSalt s p = (+ s) $ fromIntegral $ (_x p * 997) + _y p
+
 
 part1 :: Integer
 part1 = case parse instrs "Part 1" input of
