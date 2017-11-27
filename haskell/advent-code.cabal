@@ -20,6 +20,7 @@ executable advent-code
                      , base64-bytestring >= 1.0
                      , bytestring
                      , digits
+                     , hashable
                      , lens
                      , megaparsec
                      , split
