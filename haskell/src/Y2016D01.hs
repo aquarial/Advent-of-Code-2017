@@ -27,13 +27,13 @@ instance Hashable Position where
 
 
 part1 :: Integer
-part1 = case parse instrs "Part 1" input of
+part1 = case parse instructions "Part 1" input of
           Left err -> error $ show err
           Right is -> dist $ foldl update (Position 0 0 U) is
 
 
 part2 :: Integer
-part2 = case parse instrs "Part 2" input of
+part2 = case parse instructions "Part 2" input of
           Left err -> error $ show err
           Right is -> dist $ walk Set.empty (Position 0 0 U) $ concatMap flatten is
   where
@@ -65,8 +65,8 @@ update pos (Instr turn dist) = newPos newDir
 dist :: Position -> Integer
 dist pos = abs (_x pos) + abs (_y pos)
 
-instrs :: Parser [Instr]
-instrs = sepBy instr (string ", ")
+instructions :: Parser [Instr]
+instructions = sepBy instr (string ", ")
   where
     instr :: Parser Instr
     instr = Instr <$> turn <*> L.integer
