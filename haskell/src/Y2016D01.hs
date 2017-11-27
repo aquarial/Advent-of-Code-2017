@@ -11,9 +11,34 @@ import           Text.Megaparsec.Text  (Parser)
 data Turn  = TurnL | TurnR        deriving (Show, Eq)
 data Instr = Instr !Turn !Integer deriving (Show, Eq)
 
+data Direction = U | R | D | L   deriving (Show, Eq, Enum)
+data Position = Position { _x :: !Integer
+                         , _y :: !Integer
+                         , _d :: !Direction } deriving (Show)
+
+part1 :: Integer
 part1 = case parse instrs "Part 1" input of
           Left err -> error $ show err
-          Right is -> 1
+          Right is -> dist $ foldl update (Position 0 0 U) is
+
+update :: Position -> Instr -> Position
+update pos (Instr turn dist) = newPos newDir
+  where
+    newPos U = Position (_x pos) (_y pos + dist) newDir
+    newPos D = Position (_x pos) (_y pos - dist) newDir
+    newPos R = Position (_x pos + dist) (_y pos) newDir
+    newPos L = Position (_x pos - dist) (_y pos) newDir
+
+    newDir = doturn turn (_d pos)
+
+    doturn :: Turn -> Direction -> Direction
+    doturn TurnL U = L
+    doturn TurnL d = pred d
+    doturn TurnR L = U
+    doturn TurnR d = succ d
+
+dist :: Position -> Integer
+dist pos = abs (_x pos) + abs (_y pos)
 
 instrs :: Parser [Instr]
 instrs = sepBy instr (string ", ")
