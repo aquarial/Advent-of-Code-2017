@@ -7,6 +7,10 @@ import qualified Data.ByteString        as B
 import qualified Data.ByteString.Char8  as C8
 import qualified Data.ByteString.Base64 as B64
 
+import           Data.Text                 (Text)
+import qualified Data.Text                 as T
+import qualified Data.Text.Encoding        as TE
+
 smartyStreets :: Either String ByteString
 smartyStreets = B64.decode "U2VuZGluZyBDaHJpc3RtYXMgY2FyZHMgdG8gYmFkIGFkZHJlc3Nlcz8K"
 
@@ -18,7 +22,10 @@ cheppers = case B64.decode "Pz0pQUI7ChcmER8YDAEYAh4LGwEP" of
 
 -- B64.decode "Pz0pQUI7ChcmER8YDAEYAh4LGwEP"
 a :: ByteString
-a = "?=)AB;\n\ETB&\DC1\US\CAN\f\SOH\CAN\STX\RS\v\ESC\SOH\SI"
+a = TE.encodeUtf8 "?=)AB;\n\ETB&\DC1\US\CAN\f\SOH\CAN\STX\RS\v\ESC\SOH\SI"
+
+b :: ByteString
+b = TE.encodeUtf8 "↑↑↓↓←→←→BA"
 
 c :: ByteString
-c = "↑↑↓↓←→←→BA"
+c = B.pack $ B.zipWith xor a (B.concat [b, b])
