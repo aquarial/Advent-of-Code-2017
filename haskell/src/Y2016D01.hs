@@ -8,8 +8,8 @@ import           Text.Megaparsec
 import qualified Text.Megaparsec.Lexer as L
 import           Text.Megaparsec.Text  (Parser)
 
-data Turn  = TurnL | TurnR       deriving (Show, Eq)
-data Instr = Instr Turn Integer  deriving (Show, Eq)
+data Turn  = TurnL | TurnR        deriving (Show, Eq)
+data Instr = Instr !Turn !Integer deriving (Show, Eq)
 
 part1 = case parse instrs "Part 1" input of
           Left err -> error $ show err
