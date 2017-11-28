@@ -55,7 +55,7 @@ update pos (Instr turn dist) = newPos newDir
 
     newDir = doturn turn (_d pos)
 
-    doturn :: Turn -> Direction -> Direction
+    doturn :: Turn -> Direction -> Direction -- U > R > D > L
     doturn TurnL U = L
     doturn TurnL d = pred d
     doturn TurnR L = U
