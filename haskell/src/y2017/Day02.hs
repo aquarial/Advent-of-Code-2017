@@ -13,8 +13,11 @@ import           Text.Megaparsec.Text (Parser)
 import qualified Text.Megaparsec.Lexer as L
 
 
+spreadsheet :: Parser [[Integer]]
+spreadsheet = row `sepBy` char '\n'
+
 row :: Parser [Integer]
-row = sepBy L.integer space
+row = L.integer `sepBy` space
 
 main :: IO ()
 main = do
