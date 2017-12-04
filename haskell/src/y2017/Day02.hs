@@ -22,10 +22,9 @@ row = L.integer `sepBy` space
 main :: IO ()
 main = do
   input <- TIO.readFile "src/y2017/input02"
-  let process line = sort <$> parseMaybe row line
-      processed = catMaybes $ map process $ T.lines input
-      p1 = part1 processed
-      p2 = part2 processed
+  let sheet = maybe [] id $ parseMaybe spreadsheet input
+      p1 = part1 sheet
+      p2 = part2 sheet
   TIO.putStrLn $ T.pack $ show p1
   TIO.putStrLn $ T.pack $ show p2
   return ()
