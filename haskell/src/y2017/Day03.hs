@@ -25,7 +25,7 @@ part1 p = layer + abs((p - (4*layer^2 - 2*layer + 1)) `mod` layer)
 
 
 part2 :: Int -> Int
-part2 n = firstGood $ map (\(p,m) -> HMap.lookup p m) $ zip spiral $ drop 1 $ scanl' addSquare initMap spiral
+part2 n = firstGood $ map (uncurry HMap.lookup) $ zip spiral $ drop 1 $ scanl' updateMap initMap spiral
   where
     initMap = HMap.fromList [((0,0), 1)]
 
