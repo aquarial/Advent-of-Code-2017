@@ -17,8 +17,10 @@ main = do
   return ()
 
 
-part1 a = length a == length (nub a)
+part1 :: Eq a => [a] -> Bool
+part1 it = length it == length (nub it)
 
 
+part2 :: Ord a => [[a]] -> Bool
 part2 [] = True
 part2 (a:as) = not (any (\b -> sort a == sort a) as) && part2 as
