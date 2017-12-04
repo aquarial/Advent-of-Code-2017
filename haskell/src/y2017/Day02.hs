@@ -17,12 +17,12 @@ spreadsheet :: Parser [[Integer]]
 spreadsheet = row `sepBy` char '\n'
 
 row :: Parser [Integer]
-row = L.integer `sepBy` space
+row = L.integer `sepBy` tab
 
 main :: IO ()
 main = do
   input <- TIO.readFile "src/y2017/input02"
-  let sheet = maybe [] id $ parseMaybe spreadsheet input
+  let sheet = filter (not . null) $ maybe [] id $ parseMaybe spreadsheet input
       p1 = part1 sheet
       p2 = part2 sheet
   TIO.putStrLn $ T.pack $ show p1
