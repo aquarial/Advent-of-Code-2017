@@ -39,11 +39,12 @@ updateMap oldmap (x0,y0) = HMap.insert (x0,y0) value oldmap
   where
     value = sum $ map (\k -> HMap.lookupDefault 0 k oldmap) [(x0+x,y0+y) | x <- [-1..1], y <- [-1..1]]
 
+
 spiral :: [(Int, Int)]
-spiral = walk [(1,0)] 1
+spiral = walk [(1,0)]
   where
-    walk (x:[]) n = x : walk (layer n x) (n+1)
-    walk (x:xs) n = x : walk xs n
+    walk (x:[]) = x : walk (layer (fst x) x)
+    walk (x:xs) = x : walk xs
 
 layer :: Int -> (Int, Int) -> [(Int, Int)]
 layer n prev = r & d & l & u prev
