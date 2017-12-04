@@ -22,7 +22,7 @@ main = do
   input <- TIO.readFile "src/y2017/input04"
   let processed =  map (T.splitOn " ") $ T.lines input
       p1 = part1 processed
-      p2 = filter part2 processed
+      p2 = length $ filter part2 processed
   TIO.putStrLn $ T.pack $ show p1
   return ()
 
