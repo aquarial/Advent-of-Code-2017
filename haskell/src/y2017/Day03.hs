@@ -47,12 +47,12 @@ spiral = walk [(1,0)]
     walk (x:xs) = x : walk xs
 
 layer :: Int -> (Int, Int) -> [(Int, Int)]
-layer n prev = r & d & l & u prev
+layer lay prev = r & d & l & u prev
   where
-    u (x,y) = [(x,y+t) | t <- [1..2*n-1]]
-    l (x,y) = [(x-t,y) | t <- [1..2*n  ]]
-    d (x,y) = [(x,y-t) | t <- [1..2*n  ]]
-    r (x,y) = [(x+t,y) | t <- [1..2*n+1]]
+    u (x,y) = [(x,y+t) | t <- [1..2*lay-1]]
+    l (x,y) = [(x-t,y) | t <- [1..2*lay  ]]
+    d (x,y) = [(x,y-t) | t <- [1..2*lay  ]]
+    r (x,y) = [(x+t,y) | t <- [1..2*lay+1]]
 
     infixr 0 &
     (&) :: (t -> [t]) -> [t] -> [t]
