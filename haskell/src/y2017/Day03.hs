@@ -11,9 +11,9 @@ main = do
 
 part1 :: Int -> Int
 part1 1 = 0
-part1 p = shell + abs((p - (4*shell^2-2*shell+1)) `mod` shell)
+part1 p = shell + abs((p - (4*shell^2 - 2*shell + 1)) `mod` shell)
   where
-    shell = ceiling $ (sqrt (fromIntegral n) - 1) / 2
+    shell = ceiling $ (sqrt n - 1) / 2
     n = fromIntegral p
 
 
