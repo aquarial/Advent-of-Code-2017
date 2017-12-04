@@ -23,4 +23,4 @@ part1 it = length it == length (nub it)
 
 part2 :: Ord a => [[a]] -> Bool
 part2 [] = True
-part2 (a:as) = not (any (\b -> sort a == sort a) as) && part2 as
+part2 (a:as) = all (\e -> sort e /= sort a) as && part2 as
