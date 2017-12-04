@@ -11,9 +11,9 @@ main = do
 
 part1 :: Int -> Int
 part1 1 = 0
-part1 p = shell + abs((p - (4*shell^2 - 2*shell + 1)) `mod` shell)
+part1 p = layer + abs((p - (4*layer^2 - 2*layer + 1)) `mod` layer)
   where
-    shell = ceiling $ (sqrt n - 1) / 2
+    layer = ceiling $ (sqrt n - 1) / 2
     n = fromIntegral p
 
 
