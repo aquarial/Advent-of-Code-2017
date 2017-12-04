@@ -35,9 +35,8 @@ part1 nums = sum $ zipWith (-) (map maximum nums) (map minimum nums)
 
 
 part2 :: [[Integer]] -> Integer
-part2 nums = sum $ map evenlyDivide $ sort nums
+part2 nums = sum $ map (evenlyDivide . sort) nums
   where
-    evenlyDivide []     = error "Bad input02 file, no even divsors"
     evenlyDivide (x:xs) = case filter (\a -> a `mod` x == 0) xs of
                             []      -> evenlyDivide xs
                             (ans:_) -> ans `div` x
