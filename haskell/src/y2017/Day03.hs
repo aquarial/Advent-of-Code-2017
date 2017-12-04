@@ -32,7 +32,8 @@ part2 n = firstGood $ map (uncurry HMap.lookup) $ zip spiral $ drop 1 $ scanl' u
     firstGood (Nothing:xs) = firstGood xs
     firstGood (Just n2:xs) = if n2 > n then n2 else firstGood xs
 
-    --uncurry :: (a -> b -> c) -> (a, b) -> c
+    -- uncurry :: (a   -> b   -> c)          -> (a, b) -> c
+    -- lookup  ::  key -> map -> Maybe Value
 
 updateMap :: HMap.HashMap (Int, Int) Int -> (Int, Int) -> HMap.HashMap (Int, Int) Int
 updateMap oldmap (x0,y0) = HMap.insert (x0,y0) value oldmap
