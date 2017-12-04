@@ -41,7 +41,7 @@ updateMap oldmap (x0,y0) = HMap.insert (x0,y0) value oldmap
 
 
 spiral :: [(Int, Int)]
-spiral = walk [(1,0)]
+spiral = walk [(0,0), (1,0)]
   where
     walk (x:[]) = x : walk (layer (fst x) x)
     walk (x:xs) = x : walk xs
