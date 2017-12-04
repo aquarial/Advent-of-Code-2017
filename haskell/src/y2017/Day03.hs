@@ -35,8 +35,7 @@ part2 n = firstGood $ map (uncurry HMap.lookup) $ zip spiral $ drop 1 $ scanl' u
 addSquare :: HMap.HashMap (Int, Int) Int -> (Int, Int) -> HMap.HashMap (Int, Int) Int
 addSquare pmap (x0,y0) = HMap.insert (x0,y0) value pmap
   where
-    value = sum $ map (\k -> HMap.lookupDefault 0 k pmap) neighbors
-    neighbors = [(x0+x,y0+y) | x <- [-1..1], y <- [-1..1], x /= 0 || y /= 0]
+    value = sum $ map (\k -> HMap.lookupDefault 0 k oldmap) [(x0+x,y0+y) | x <- [-1..1], y <- [-1..1]]
 
 spiral :: [(Int, Int)]
 spiral = walk [(1,0)] 1
