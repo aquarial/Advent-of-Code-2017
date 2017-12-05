@@ -38,7 +38,11 @@ p = V.fromList <$> signedInt `sepBy` char '\n'
       neg . fromInteger <$> L.integer
 
 
-
+-- ???
+part1_mut vec = walk (V.thaw vec) 0 0
+  where
+    walk :: MVector Int Int -> Int -> t -> t
+    walk vec i acc = undefined
 
 
 part1 :: Vector Int -> Int
