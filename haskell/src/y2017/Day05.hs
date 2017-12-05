@@ -22,7 +22,7 @@ main = do
   return ()
 
 p :: Parser [Integer]
-p = undefined
+p = integer `sepBy` char '\n'
 
 part1 :: [Integer] -> Integer
 part1 = undefined
