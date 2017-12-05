@@ -31,14 +31,16 @@ p = signedInt `sepBy` char '\n'
       neg <$> L.integer
 
 part1 :: [Integer] -> Integer
-part1 = walk (+1) [] . map fromInteger
+part1 = walk (+1) . map fromInteger
 
 part2 :: [Integer] -> Integer
-part2 = walk change [] . map fromInteger
+part2 = walk change . map fromInteger
   where
     change x = if x < 3 then x+1 else x-1
 
-walk :: Num a => (Int -> Int) -> [Int] -> [Int] -> a
-walk cng _  []     = 0
-walk cng as (b:bs) | b <= 0 = 1 + walk cng ( drop (-b) as )  ( reverse (take (-b) as) ++ [cng b] ++ bs )
-walk cng as (b:bs) | b >  0 = 1 + walk cng ( reverse (take b ((cng b):bs)) ++ as )  (drop b (b:bs))
+walk :: Num a => (Int -> Int) -> [Int] -> a
+walk changer list = walkacc 0 [] list
+  where
+    walkacc acc _  []     = acc
+    walkacc acc as (b:bs) | b <= 0 = walkacc (acc+1) ( drop (-b) as )  ( reverse (take (-b) as) ++ [changer b] ++ bs )
+    walkacc acc as (b:bs) | b >  0 = walkacc (acc+1) ( reverse (take b ((changer b):bs)) ++ as )  (drop b (b:bs))
