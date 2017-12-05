@@ -38,4 +38,9 @@ part1 = walk [] . map fromInteger
     walk as (b:bs) | b >  0 = 1 + walk ( reverse (take b ((b+1):bs)) ++ as )  (drop b (b:bs))
 
 part2 :: [Integer] -> Integer
-part2 = undefined
+part2 =walk [] . map fromInteger
+  where
+    change x = if x < 3 then x+1 else x-1
+    walk _  []     = 0
+    walk as (b:bs) | b <= 0 = 1 + walk ( drop (-b) as )  ( reverse (take (-b) as) ++ [change b] ++ bs )
+    walk as (b:bs) | b >  0 = 1 + walk ( reverse (take b ((change b):bs)) ++ as )  (drop b (b:bs))
