@@ -1,10 +1,10 @@
 module Day05 where
 
-import           Data.Text             as T
-import           Data.Text.IO          as TIO
+import qualified Data.Text             as T
+import qualified Data.Text.IO          as TIO
 
 import           Text.Megaparsec
-import           Text.Megaparsec.Lexer as L
+import qualified Text.Megaparsec.Lexer as L
 import           Text.Megaparsec.Text  (Parser)
 
 
@@ -22,7 +22,7 @@ main = do
   return ()
 
 p :: Parser [Integer]
-p = integer `sepBy` char '\n'
+p = L.integer `sepBy` char '\n'
 
 part1 :: [Integer] -> Integer
 part1 = undefined
