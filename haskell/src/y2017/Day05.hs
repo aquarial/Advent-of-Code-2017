@@ -4,6 +4,9 @@ module Day05 where
 import qualified Data.Text             as T
 import qualified Data.Text.IO          as TIO
 
+import           Data.Vector           (Vector)
+import qualified Data.Vector           as V
+
 import           Text.Megaparsec
 import qualified Text.Megaparsec.Lexer as L
 import           Text.Megaparsec.Text  (Parser)
@@ -19,20 +22,25 @@ main = do
     Left  err   -> TIO.putStr $ T.pack $ parseErrorPretty err
     Right jumps -> do
       tprint $ part1 jumps
-      tprint $ part2 jumps
+      --tprint $ part2 jumps
   return ()
 
-p :: Parser [Integer]
-p = signedInt `sepBy` char '\n'
+p :: Parser (Vector Int)
+p = V.fromList <$> signedInt `sepBy` char '\n'
   where
-    signedInt :: Parser Integer
+    signedInt :: Parser Int
     signedInt = do
       neg <- negate <$ char '-' <|> pure id
-      neg <$> L.integer
+      neg . fromInteger <$> L.integer
 
-part1 :: [Integer] -> Integer
-part1 = walk (+1) . map fromInteger
 
+
+
+
+part1 :: Vector Int -> Int
+part1 = undefined
+
+{-
 part2 :: [Integer] -> Integer
 part2 = walk change . map fromInteger
   where
@@ -44,3 +52,4 @@ walk changer list = walkacc 0 [] list
     walkacc acc _  []     = acc
     walkacc acc as (b:bs) | b <= 0 = walkacc (acc+1) ( drop (-b) as )  ( reverse (take (-b) as) ++ [changer b] ++ bs )
     walkacc acc as (b:bs) | b >  0 = walkacc (acc+1) ( reverse (take b ((changer b):bs)) ++ as )  (drop b (b:bs))
+-}
