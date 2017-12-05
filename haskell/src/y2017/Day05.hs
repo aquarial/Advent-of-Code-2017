@@ -38,7 +38,11 @@ p = V.fromList <$> signedInt `sepBy` char '\n'
 
 
 part1 :: Vector Int -> Int
-part1 = undefined
+part1 vec = walk vec 0 0
+  where
+    walk vec i acc = case vec V.!? i of
+                   Nothing -> acc
+                   Just dx -> walk (vec V.// [(i, dx+1)]) (i+dx) (acc+1)
 
 {-
 part2 :: [Integer] -> Integer
