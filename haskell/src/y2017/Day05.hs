@@ -23,7 +23,12 @@ main = do
   return ()
 
 p :: Parser [Integer]
-p = L.integer `sepBy` char '\n'
+p = signedInt `sepBy` char '\n'
+  where
+    signedInt :: Parser Integer
+    signedInt = do
+      neg <- negate <$ char '-' <|> pure id
+      neg <$> L.integer
 
 part1 :: [Integer] -> Integer
 part1 = walk [] . map fromInteger
