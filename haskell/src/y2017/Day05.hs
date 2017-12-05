@@ -25,7 +25,11 @@ p :: Parser [Integer]
 p = L.integer `sepBy` char '\n'
 
 part1 :: [Integer] -> Integer
-part1 = undefined
+part1 = walk [] . map fromInteger
+  where
+    walk _  []     = 0
+    walk as (b:bs) | b <= 0 = 1 + walk ( drop (-b) as )  ( reverse (take (-b) as) ++ [b+1] ++ bs )
+    walk as (b:bs) | b >  0 = 1 + walk ( reverse (take b ((b+1):bs)) )  (drop b (b:bs))
 
 part2 :: [Integer] -> Integer
 part2 = undefined
