@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Day05 where
 
 import qualified Data.Text             as T
