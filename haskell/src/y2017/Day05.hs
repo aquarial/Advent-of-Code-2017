@@ -5,12 +5,16 @@ import qualified Data.Text             as T
 import qualified Data.Text.IO          as TIO
 
 import           Data.Vector           (Vector)
+import           Data.Vector.Mutable   (MVector)
 import qualified Data.Vector           as V
+import qualified Data.Vector.Mutable   as MV
 
+import           Text.Megaparsec.Text  (Parser)
 import           Text.Megaparsec
 import qualified Text.Megaparsec.Lexer as L
-import           Text.Megaparsec.Text  (Parser)
 
+import           Control.Monad
+import qualified Control.Monad.ST      as ST
 
 
 tprint :: Show a => a -> IO ()
