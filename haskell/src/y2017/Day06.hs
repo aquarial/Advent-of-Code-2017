@@ -20,11 +20,11 @@ tprint = TIO.putStrLn . T.pack . show
 
 main = do
   input <- TIO.readFile "src/y2017/input06"
-  case parse p "input05" input of
+  case parse p "input06" input of
     Left  err   -> TIO.putStr $ T.pack $ parseErrorPretty err
     Right jumps -> do
+      tprint $ part1 jumps
       tprint $ part2 jumps
-      --tprint $ part2 jumps
   return ()
 
 p :: Parser [Int]
@@ -35,7 +35,14 @@ p = signedInt `sepBy` char '\t'
       neg <- negate <$ char '-' <|> pure id
       neg . fromInteger <$> L.integer
 
-part1 a = a
+part1 :: Num t => [Int] -> t
+part1 xs = walkout1 S.empty xs 0
+
+
+walkout1 :: Num t => S.Set [Int] -> [Int] -> t -> t
+walkout1 s a acc = if (S.member next s) then acc+1 else walkout1 (S.insert next s) next (acc+1)
+  where
+    next = walk a
 
 part2 :: Num t => [Int] -> t
 part2 xs = walkout M.empty xs 0
