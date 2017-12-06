@@ -10,6 +10,7 @@ import qualified Text.Megaparsec.Lexer as L
 
 
 import qualified Data.Set  as S
+import qualified Data.Map as M
 
 import           Data.Maybe            (catMaybes)
 import Debug.Trace
@@ -37,11 +38,12 @@ p = signedInt `sepBy` char '\t'
 part1 a = a
 
 part2 :: Num t => [Int] -> t
-part2 xs = walkout S.empty xs 0
+part2 xs = walkout M.empty xs 0
 
+f (Just a) = a
+f (Nothing) = error "aaaah"
 
-walkout :: Num t => S.Set [Int] -> [Int] -> t -> t
-walkout s a acc = if (S.member next s) then acc+1 else walkout (S.insert next s) next (acc+1)
+walkout s a acc = if (M.member next s) then f(M.lookup (next) s) - acc else walkout (M.insert next acc s) next (acc+1)
   where
     next = walk a
 

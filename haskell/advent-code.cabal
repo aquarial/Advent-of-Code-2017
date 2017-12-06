@@ -26,5 +26,6 @@ executable advent-code
                      , split
                      , text
                      , unordered-containers
+                     , containers
                      , vector
                      , wreq
