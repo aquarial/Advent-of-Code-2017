@@ -24,7 +24,7 @@ main = do
     Left  err   -> TIO.putStr $ T.pack $ parseErrorPretty err
     Right betterInput -> do
       tprint $ part1 betterInput
-      tprint $ part betterInput
+      tprint $ part2 betterInput
   return ()
 
 p :: Parser [(String, Int, [String])]
@@ -49,8 +49,12 @@ supports = do
     word =  some $ noneOf (", \n" :: String)
 
 
-part1 xs = filter (appearsInSupports xs) xs
-part xs = map (weight xs) xs
+part1 xs = map (\(a,_,_) -> a) $ filter (appearsInNoSupports xs) xs
+appearsInNoSupports xs (name,_,_) = all (\(_,_,supports) -> notElem name supports) xs
+
+
+
+part2 xs = map (weight xs) xs
 
 int = do
       change <- negate <$ char '-' <|> pure id
@@ -58,17 +62,15 @@ int = do
 
 weight :: [(String, Int, [String])] -> (String, Int, [String]) -> (Int, String)
 weight xs (name,w23,supports) = case length $ nub $ map fst ws of
-                                     1 -> (w23 + sum (map fst ws),  concat $map snd $ filter (\i -> not (null (snd i))) ws)
-                                     0 -> (w23 + sum (map fst ws),  concat $map snd $ filter (\i -> not (null (snd i))) ws)
                                      2 -> if (all null (map snd ws) )
                                           then trace (name ++ show (zip ws333 (map fst ws))) $ (0, show $map fst ws)
                                           else head $ filter (\i -> not (null (snd i))) ws
+                                     _ -> (w23 + sum (map fst ws),  concat $map snd $ filter (\i -> not (null (snd i))) ws)
   where
     ws :: [(Int, String)]
     ws = map (weight xs) $ filter (\(n,_,_) -> elem n supports) xs
     ws333 = map (\(n,_,_) -> n) $ filter (\(n,_,_) -> elem n supports) xs
 
-appearsInSupports xs (name,_,_) = all (\(_,_,c) -> notElem name c) xs
 
 partstr xs = xs
 
