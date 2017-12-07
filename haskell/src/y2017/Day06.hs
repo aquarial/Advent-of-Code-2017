@@ -48,9 +48,6 @@ walkout s a acc = if (M.member next s) then f(M.lookup (next) s) - acc else walk
   where
     next = walk a
 
-replace x [] _ = []
-replace 0 (x:xs) i = i:xs
-replace n (x:xs) i = x:replace (n-1) xs i
 
 walk :: [Int] -> [Int]
 walk ls = add1 ix eve
@@ -67,6 +64,10 @@ walk ls = add1 ix eve
 --ls = [0, 2, 7, 0]
 
 
+replace :: Int -> a -> [a] -> [a]
+replace i e []     = []
+replace 0 e (x:xs) = e:xs
+replace i e (x:xs) = x:replace (i-1) e xs
 
 findmax :: [Int] -> Int
 findmax xs = case findIndex (\n -> n == maximum xs) xs of
