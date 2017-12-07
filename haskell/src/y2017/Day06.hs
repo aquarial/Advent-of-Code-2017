@@ -25,12 +25,9 @@ main = do
   return ()
 
 p :: Parser [Int]
-p = signedInt `sepBy` char '\t'
+p = int `sepBy` char '\t'
   where
-    signedInt :: Parser Int
-    signedInt = do
-      neg <- negate <$ char '-' <|> pure id
-      neg . fromInteger <$> L.integer
+    int = fromInteger <$> L.integer
 
 part1 :: Num t => [Int] -> t
 part1 xs = walkout1 S.empty xs 0
