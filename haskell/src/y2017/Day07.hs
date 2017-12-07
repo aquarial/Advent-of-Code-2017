@@ -12,9 +12,6 @@ import           Text.Megaparsec.Text  (Parser)
 import           Data.List
 import qualified Data.Map.Strict       as M
 import qualified Data.Set              as S
-import qualified Data.Maybe            (maybeToList)
-
-import           Debug.Trace
 
 tprint :: Show a => a -> IO ()
 tprint = TIO.putStrLn . T.pack . show
@@ -53,8 +50,9 @@ name (a, _, _) = a
 size (_, a, _) = a
 sups (_, _, a) = a
 
+
 part1 :: [(String, Int, [String])] -> String
-part1 xs = head $ map name $ filter (appearsInNoSupports xs) xs
+part1 xs = name $ head $ filter (appearsInNoSupports xs) xs
 
 appearsInNoSupports :: [(String, Int, [String])] -> (String, Int, [String]) -> Bool
 appearsInNoSupports xs x = not . any (elem (name x) . sups) $ xs
