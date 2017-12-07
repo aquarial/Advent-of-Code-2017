@@ -20,6 +20,9 @@ main = do
   case parse p "input06" input of
     Left  err   -> TIO.putStr $ T.pack $ parseErrorPretty err
     Right jumps -> do
+      let (a,b) = solve jumps
+      tprint a
+      tprint b
   return ()
 
 p :: Parser [Int]
@@ -28,6 +31,8 @@ p = int `sepBy` char '\t'
     int = fromInteger <$> L.integer
 
 
+solve :: Num t => [Int] -> (t, t)
+solve xs = walkout M.empty xs 0
 
 walkout :: Num t => M.Map [Int] t -> [Int] -> t -> (t, t)
 walkout seen blocks acc = case M.lookup next seen of
