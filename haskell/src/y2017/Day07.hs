@@ -49,8 +49,15 @@ supports :: Parser [String]
 supports = string " -> "   *>   some letterChar `sepBy` string ", "
 
 
-part1 xs = map (\(a,_,_) -> a) $ filter (appearsInNoSupports xs) xs
-appearsInNoSupports xs (name,_,_) = all (\(_,_,supports) -> notElem name supports) xs
+name (a, _, _) = a
+size (_, a, _) = a
+sups (_, _, a) = a
+
+part1 :: [(String, Int, [String])] -> String
+part1 xs = head $ map name $ filter (appearsInNoSupports xs) xs
+
+appearsInNoSupports :: [(String, Int, [String])] -> (String, Int, [String]) -> Bool
+appearsInNoSupports xs x = not . any (elem (name x) . sups) $ xs
 
 
 
