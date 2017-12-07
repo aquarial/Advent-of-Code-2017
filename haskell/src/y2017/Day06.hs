@@ -4,16 +4,13 @@ module Day06 where
 import qualified Data.Text             as T
 import qualified Data.Text.IO          as TIO
 
-import           Text.Megaparsec.Text  (Parser)
 import           Text.Megaparsec
 import qualified Text.Megaparsec.Lexer as L
+import           Text.Megaparsec.Text  (Parser)
 
-
-import qualified Data.Set  as S
-import qualified Data.Map as M
-
-import           Data.Maybe            (catMaybes)
-import Debug.Trace
+import qualified Data.Map              as M
+import qualified Data.Set              as S
+import           Data.List
 
 tprint :: Show a => a -> IO ()
 tprint = TIO.putStrLn . T.pack . show
