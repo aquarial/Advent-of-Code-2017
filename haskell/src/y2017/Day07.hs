@@ -1,6 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Day06 where
+module Day07 where
 
+import  Data.Text             (Text)
 import qualified Data.Text             as T
 import qualified Data.Text.IO          as TIO
 
@@ -17,23 +18,42 @@ tprint :: Show a => a -> IO ()
 tprint = TIO.putStrLn . T.pack . show
 
 main = do
-  input <- TIO.readFile "src/y2017/input06"
-  tprint $ partstr $ T.splitOn "\n" input
-  case parse p "input06" input of
+  input <- TIO.readFile "src/y2017/input07"
+  case parse p "input07" input of
     Left  err   -> TIO.putStr $ T.pack $ parseErrorPretty err
     Right betterInput -> do
       tprint $ part betterInput
   return ()
 
-p :: Parser [[Int]]
-p = (int `sepBy` space) `sepBy` char '\n'
+
+fileName :: Parser (String, Int, [String])
+fileName = do
+  name <- some $noneOf [' ']
+  char ' '
+  char '('
+  size <- int
+  char ')'
+  deps <- supports <|> pure []
+  return (name, size, deps)
+
+p :: Parser [(String, Int, [String])]
+p = fileName `sepBy` char '\n'
+
+supports :: Parser [String]
+supports = do
+      string (" -> " :: String)
+      (sepBy word (string ", "))
   where
-    int = do
+    word :: Parser String
+    word =  some $ noneOf (", \n" :: String)
+
+int = do
       change <- negate <$ char '-' <|> pure id
       fromInteger . change <$> L.integer
 
-part xs = xs
+part xs = filter (appearsInSupports xs) xs
 
+appearsInSupports xs (name,_,_) = all (\(_,_,c) -> notElem name c) xs
 
 partstr xs = xs
 
