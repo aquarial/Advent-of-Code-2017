@@ -12,6 +12,7 @@ import           Text.Megaparsec.Text  (Parser)
 import           Data.List
 import qualified Data.Map.Strict       as M
 import qualified Data.Set              as S
+import qualified Data.Maybe            (maybeToList)
 
 import           Debug.Trace
 
@@ -28,25 +29,24 @@ main = do
   return ()
 
 p :: Parser [(String, Int, [String])]
-p = fileName `sepBy` char '\n'
+p = program `sepBy` char '\n'
 
-fileName :: Parser (String, Int, [String])
-fileName = do
-  name <- some $ noneOf [' ']
-  char ' '
-  char '('
+program :: Parser (String, Int, [String])
+program = do
+  name <- some letterChar
+  string " ("
   size <- int
-  char ')'
-  deps <- supports <|> pure []
-  return (name, size, deps)
+  string ")"
+  deps <- option [] supports
+  pure (name, size, deps)
+
+int :: Parser Int
+int = do
+      change <- option id (negate <$ char '-')
+      fromInteger . change <$> L.integer
 
 supports :: Parser [String]
-supports = do
-      string (" -> " :: String)
-      (sepBy word (string ", "))
-  where
-    word :: Parser String
-    word =  some $ noneOf (", \n" :: String)
+supports = string " -> "   *>   some letterChar `sepBy` string ", "
 
 
 part1 xs = map (\(a,_,_) -> a) $ filter (appearsInNoSupports xs) xs
@@ -56,9 +56,6 @@ appearsInNoSupports xs (name,_,_) = all (\(_,_,supports) -> notElem name support
 
 part2 xs = map (weight xs) xs
 
-int = do
-      change <- negate <$ char '-' <|> pure id
-      fromInteger . change <$> L.integer
 
 weight :: [(String, Int, [String])] -> (String, Int, [String]) -> (Int, String)
 weight xs (name,w23,supports) = case length $ nub $ map fst ws of
