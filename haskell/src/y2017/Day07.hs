@@ -59,18 +59,29 @@ appearsInNoSupports xs x = not . any (elem (name x) . sups) $ xs
 
 
 
-part2 xs = map (weight xs) xs
-
-
-weight :: [(String, Int, [String])] -> (String, Int, [String]) -> (Int, String)
-weight xs (name,w23,supports) = case length $ nub $ map fst ws of
-                                     2 -> if (all null (map snd ws) )
-                                          then trace (name ++ show (zip ws333 (map fst ws))) $ (0, show $map fst ws)
-                                          else head $ filter (\i -> not (null (snd i))) ws
-                                     _ -> (w23 + sum (map fst ws),  concat $map snd $ filter (\i -> not (null (snd i))) ws)
+part2 xs = findImbalance xs root 0
   where
-    ws :: [(Int, String)]
-    ws = map (weight xs) $ filter (\(n,_,_) -> elem n supports) xs
-    ws333 = map (\(n,_,_) -> n) $ filter (\(n,_,_) -> elem n supports) xs
+    root = head $ filter (appearsInNoSupports xs) xs
 
+findImbalance :: [(String, Int, [String])] -> (String, Int, [String]) -> Int -> Int
+findImbalance others curr actual = case findUniqueWeight supports supWeights of
+                              Nothing  -> actual - sum supWeights
+                              Just u   -> findImbalance others u (ordinary supWeights)
+  where
+    supports = supporters others curr
+    supWeights = map (weight others) supports
+
+ordinary :: [Int] -> Int
+ordinary (x:xs) = if elem x xs then x else ordinary xs
+
+findUniqueWeight :: [(String, Int, [String])] -> [Int] -> Maybe (String, Int, [String])
+findUniqueWeight programs weights = case filter (snd) $ zip programs $ map (/=expected) weights of
+                                      (prog,_):[] -> Just prog
+                                      _           -> Nothing
+  where
+    expected = ordinary weights
+
+weight others x = size x + sum (map (weight others) (supporters others x))
+
+supporters others x = filter (\o -> elem (name o) (sups x)) others
 
