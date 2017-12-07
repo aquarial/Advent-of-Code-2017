@@ -14,6 +14,8 @@ import qualified Data.Map.Strict       as M
 import           Data.Maybe            (catMaybes)
 import qualified Data.Set              as S
 
+import Debug.Trace
+
 tprint :: Show a => a -> IO ()
 tprint = TIO.putStrLn . T.pack . show
 
@@ -51,7 +53,20 @@ int = do
       change <- negate <$ char '-' <|> pure id
       fromInteger . change <$> L.integer
 
-part xs = filter (appearsInSupports xs) xs
+part xs = map (weight xs) xs
+s (a,b,c) = b
+
+weight :: [(String, Int, [String])] -> (String, Int, [String]) -> (Int, String)
+weight xs (name,w23,supports) = case length $ nub $ map fst ws of
+                                     1 -> (w23 + sum (map fst ws),  concat $map snd $ filter (\i -> not (null (snd i))) ws)
+                                     0 -> (w23 + sum (map fst ws),  concat $map snd $ filter (\i -> not (null (snd i))) ws)
+                                     2 -> if (all null (map snd ws) )
+                                          then trace (name ++ show (zip ws333 (map fst ws))) $ (0, show $map fst ws)
+                                          else head $ filter (\i -> not (null (snd i))) ws
+  where
+    ws :: [(Int, String)]
+    ws = map (weight xs) $ filter (\(n,_,_) -> elem n supports) xs
+    ws333 = map (\(n,_,_) -> n) $ filter (\(n,_,_) -> elem n supports) xs
 
 appearsInSupports xs (name,_,_) = all (\(_,_,c) -> notElem name c) xs
 
