@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Day07 where
 
-import  Data.Text             (Text)
+import           Data.Text             (Text)
 import qualified Data.Text             as T
 import qualified Data.Text.IO          as TIO
 
@@ -11,10 +11,9 @@ import           Text.Megaparsec.Text  (Parser)
 
 import           Data.List
 import qualified Data.Map.Strict       as M
-import           Data.Maybe            (catMaybes)
 import qualified Data.Set              as S
 
-import Debug.Trace
+import           Debug.Trace
 
 tprint :: Show a => a -> IO ()
 tprint = TIO.putStrLn . T.pack . show
@@ -24,22 +23,22 @@ main = do
   case parse p "input07" input of
     Left  err   -> TIO.putStr $ T.pack $ parseErrorPretty err
     Right betterInput -> do
+      tprint $ part1 betterInput
       tprint $ part betterInput
   return ()
 
+p :: Parser [(String, Int, [String])]
+p = fileName `sepBy` char '\n'
 
 fileName :: Parser (String, Int, [String])
 fileName = do
-  name <- some $noneOf [' ']
+  name <- some $ noneOf [' ']
   char ' '
   char '('
   size <- int
   char ')'
   deps <- supports <|> pure []
   return (name, size, deps)
-
-p :: Parser [(String, Int, [String])]
-p = fileName `sepBy` char '\n'
 
 supports :: Parser [String]
 supports = do
@@ -49,12 +48,13 @@ supports = do
     word :: Parser String
     word =  some $ noneOf (", \n" :: String)
 
+
+part1 xs = filter (appearsInSupports xs) xs
+part xs = map (weight xs) xs
+
 int = do
       change <- negate <$ char '-' <|> pure id
       fromInteger . change <$> L.integer
-
-part xs = map (weight xs) xs
-s (a,b,c) = b
 
 weight :: [(String, Int, [String])] -> (String, Int, [String]) -> (Int, String)
 weight xs (name,w23,supports) = case length $ nub $ map fst ws of
