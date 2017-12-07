@@ -68,8 +68,10 @@ findImbalance others curr actual = case findUniqueWeight supports supWeights of
                               Nothing  -> actual - sum supWeights
                               Just u   -> findImbalance others u (ordinary supWeights)
   where
-    supports = supporters others curr
-    supWeights = map (weight others) supports
+    supporters x = filter (\o -> elem (name o) (sups x)) others
+    supports = supporters curr
+    supWeights = map weight supports
+    weight x = size x + sum (map weight (supporters x))
 
 ordinary :: [Int] -> Int
 ordinary (x:xs) = if elem x xs then x else ordinary xs
@@ -81,7 +83,5 @@ findUniqueWeight programs weights = case filter (snd) $ zip programs $ map (/=ex
   where
     expected = ordinary weights
 
-weight others x = size x + sum (map (weight others) (supporters others x))
 
-supporters others x = filter (\o -> elem (name o) (sups x)) others
 
