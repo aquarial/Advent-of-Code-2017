@@ -72,6 +72,6 @@ walk ls = add1 ix eve
 
 
 findmax :: [Int] -> Int
-findmax as = fst . head . filter (\x -> (m == snd x)) $ zip [0..] as
-  where
-    m = maximum as
+findmax xs = case findIndex (\n -> n == maximum xs) xs of
+               Nothing -> 0
+               Just ix -> ix
