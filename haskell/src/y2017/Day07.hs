@@ -76,9 +76,3 @@ weight xs (name,w23,supports) = case length $ nub $ map fst ws of
     ws333 = map (\(n,_,_) -> n) $ filter (\(n,_,_) -> elem n supports) xs
 
 
-partstr xs = xs
-
-replace :: Int -> a -> [a] -> [a]
-replace i e []     = []
-replace 0 e (x:xs) = e:xs
-replace i e (x:xs) = x:replace (i-1) e xs
