@@ -46,23 +46,16 @@ f (Nothing) = error "aaaah"
 
 walkout s a acc = if (M.member next s) then f(M.lookup (next) s) - acc else walkout (M.insert next acc s) next (acc+1)
   where
-    next = walk a
+    next = onecycle blocks
 
-
-walk :: [Int] -> [Int]
-walk ls = add1 ix eve
+onecycle :: [Int] -> [Int]
+onecycle ls = add1at (replace maxindex 0 ls) ixs
   where
-  add1 [] e = e
-  add1 (x:xs) e = add1 xs $ replace x e ((e !! x) + 1)
-  eve :: [Int]
-  eve = replace i ls 0
-  i = findmax ls
-  i2 = findmax eve
-  ix :: [Int]
-  ix = take (ls !! i) $map (\x -> x `mod` (length ls)) $ [i+1..]
+  ixs = take (ls !! maxindex) $ map (\x -> x `mod` length ls) [maxindex+1..]
+  maxindex = findmax ls
 
---ls = [0, 2, 7, 0]
-
+add1at :: Num a => [a] -> [Int] -> [a]
+add1at = foldl' (\ls index -> replace index ((ls !! index) + 1) ls)
 
 replace :: Int -> a -> [a] -> [a]
 replace i e []     = []
