@@ -65,8 +65,8 @@ part2 xs = findImbalance xs root 0
 
 findImbalance :: [(Text, Int, [Text])] -> (Text, Int, [Text]) -> Int -> Int
 findImbalance others curr actual = case findUniqueWeight supports supWeights of
-                              Nothing  -> actual - sum supWeights
-                              Just u   -> findImbalance others u (ordinary supWeights)
+                                     Nothing  -> actual - sum supWeights
+                                     Just u   -> findImbalance others u (ordinary supWeights)
   where
     supporters x = filter (\o -> elem (name o) (sups x)) others
     supports = supporters curr
