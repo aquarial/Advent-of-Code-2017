@@ -59,6 +59,8 @@ appearsInNoSupports xs x = not . any (elem (name x) . sups) $ xs
 
 
 
+
+part2 :: [(Text, Int, [Text])] -> Int
 part2 xs = findImbalance xs root 0
   where
     root = head $ filter (appearsInNoSupports xs) xs
