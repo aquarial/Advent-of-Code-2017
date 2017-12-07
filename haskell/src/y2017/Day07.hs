@@ -25,25 +25,25 @@ main = do
       tprint $ part2 betterInput
   return ()
 
-p :: Parser [(String, Int, [String])]
+p :: Parser [(Text, Int, [Text])]
 p = program `sepBy` char '\n'
 
-program :: Parser (String, Int, [String])
+program :: Parser (Text, Int, [Text])
 program = do
   name <- some letterChar
   string " ("
   size <- int
   string ")"
   deps <- option [] supports
-  pure (name, size, deps)
+  pure (T.pack name, size, deps)
 
 int :: Parser Int
 int = do
       change <- option id (negate <$ char '-')
       fromInteger . change <$> L.integer
 
-supports :: Parser [String]
-supports = string " -> "   *>   some letterChar `sepBy` string ", "
+supports :: Parser [Text]
+supports = string " -> "   *>  (T.pack <$> some letterChar) `sepBy` string ", "
 
 
 name (a, _, _) = a
@@ -51,10 +51,10 @@ size (_, a, _) = a
 sups (_, _, a) = a
 
 
-part1 :: [(String, Int, [String])] -> String
+part1 :: [(Text, Int, [Text])] -> Text
 part1 xs = name $ head $ filter (appearsInNoSupports xs) xs
 
-appearsInNoSupports :: [(String, Int, [String])] -> (String, Int, [String]) -> Bool
+appearsInNoSupports :: [(Text, Int, [Text])] -> (Text, Int, [Text]) -> Bool
 appearsInNoSupports xs x = not . any (elem (name x) . sups) $ xs
 
 
@@ -63,7 +63,7 @@ part2 xs = findImbalance xs root 0
   where
     root = head $ filter (appearsInNoSupports xs) xs
 
-findImbalance :: [(String, Int, [String])] -> (String, Int, [String]) -> Int -> Int
+findImbalance :: [(Text, Int, [Text])] -> (Text, Int, [Text]) -> Int -> Int
 findImbalance others curr actual = case findUniqueWeight supports supWeights of
                               Nothing  -> actual - sum supWeights
                               Just u   -> findImbalance others u (ordinary supWeights)
@@ -76,7 +76,7 @@ findImbalance others curr actual = case findUniqueWeight supports supWeights of
 ordinary :: [Int] -> Int
 ordinary (x:xs) = if elem x xs then x else ordinary xs
 
-findUniqueWeight :: [(String, Int, [String])] -> [Int] -> Maybe (String, Int, [String])
+findUniqueWeight :: [(Text, Int, [Text])] -> [Int] -> Maybe (Text, Int, [Text])
 findUniqueWeight programs weights = case filter (snd) $ zip programs $ map (/=expected) weights of
                                       (prog,_):[] -> Just prog
                                       _           -> Nothing
