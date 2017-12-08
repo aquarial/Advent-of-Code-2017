@@ -25,7 +25,7 @@ main = do
       tprint $ partA betterInput
   return ()
 
-data Ctrl = Inc | Dec
+type Instruction = (Text, Int->Int, Text, (Int->Bool))
 
 comparitor :: Text -> (Int -> Int -> Bool)
 comparitor ts | ts == "==" = (==)
