@@ -70,7 +70,8 @@ tup1 (a,b,c) = a
 tup2 (a,b,c) = b
 tup3 (a,b,c) = c
 
-partA xs = walk xs (M.empty) 0
+partA xs = let (m, s) = walk xs (M.empty) 0
+           in (maximum (M.elems m), s)
 
 walk []                               m ma = (m, ma)
 walk ((this, change, other, test):xs) m ma = walk xs (if test valother then M.insert this (change valthis) m else m) (maximum [ma, valthis, valother])
