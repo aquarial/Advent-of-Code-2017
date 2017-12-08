@@ -18,6 +18,10 @@ tprint = TIO.putStrLn . T.pack . show
 
 main = do
   input <- TIO.readFile "src/y2017/inputTHEDAY"
+  case parse p "testinputTHEDAY" input of
+    Left  err   -> TIO.putStr $ T.pack $ parseErrorPretty err
+    Right betterInput -> do
+      tprint $ partA betterInput
   case parse p "inputTHEDAY" input of
     Left  err   -> TIO.putStr $ T.pack $ parseErrorPretty err
     Right betterInput -> do
