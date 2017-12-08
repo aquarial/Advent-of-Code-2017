@@ -27,43 +27,39 @@ main = do
 
 type Instruction = (Text, Int->Int, Text, (Int->Bool))
 
-comparitor :: Text -> (Int -> Int -> Bool)
-comparitor ts | ts == "==" = (==)
-              | ts == "!=" = (/=)
-              | ts == ">"  = (>)
-              | ts == "<"  = (<)
-              | ts == ">=" = (>=)
-              | ts == "<=" = (<=)
-
 p :: Parser [Instruction]
 p = line `sepBy` char '\n'
 
-line = do
-  name <- word
-  string " "
-  ctr <- (+) <$ string "inc" <|> (subtract) <$ string "dec"
-  string " "
-  size <- int
-  string " if "
-  other <- word
-  string " "
-  compar <- comparitor . T.pack <$> some (oneOf (['<','>','!','=']))
-  string " "
-  det <- int
-  pure (name, ctr size, other, (\x -> x `compar` det))
+line = do reg <- word
+          space
+          change <- (+) <$ string "inc" <|> subtract <$ string "dec"
+          space
+          size <- int
+          string " if "
+          other <- word
+          space
+          comparer <- comparitor <$> symb
+          space
+          limit <- int
+          pure (reg, change size, other, (`comparer` limit))
+
+symb :: Parser Text
+symb = T.pack <$> some symbolChar
 
 word :: Parser Text
 word = T.pack <$> some letterChar
 
 int :: Parser Int
-int = do
-      change <- option id (negate <$ char '-')
-      fromInteger . change <$> L.integer
+int = do change <- option id (negate <$ char '-')
+         fromInteger . change <$> L.integer
 
+comparitor "==" = (==)
+comparitor "!=" = (/=)
+comparitor ">"  = (>)
+comparitor "<"  = (<)
+comparitor ">=" = (>=)
+comparitor "<=" = (<=)
 
-tup1 (a,b,c) = a
-tup2 (a,b,c) = b
-tup3 (a,b,c) = c
 -- type Instruction = (Text, Int->Int, Text, (Int->Bool))
 
 partA :: [Instruction] -> (Int, Int)
