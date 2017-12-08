@@ -18,11 +18,6 @@ tprint :: Show a => a -> IO ()
 tprint = TIO.putStrLn . T.pack . show
 
 main = do
-  input <- TIO.readFile "src/y2017/testinput08"
-  case parse p "testinput08" input of
-    Left  err   -> TIO.putStr $ T.pack $ parseErrorPretty err
-    Right betterInput -> do
-      tprint $ partA betterInput
   input <- TIO.readFile "src/y2017/input08"
   case parse p "input08" input of
     Left  err   -> TIO.putStr $ T.pack $ parseErrorPretty err
