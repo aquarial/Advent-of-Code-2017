@@ -24,16 +24,16 @@ main = do
       tprint $ partA betterInput
   return ()
 
-p :: Parser [(Text, Int, [Text])]
-p = program `sepBy` char '\n'
+p :: Parser [()]
+p = line `sepBy` char '\n'
 
-program = do
+line = do
   name <- word
   string " ("
   size <- int
   string ")"
-  deps <- option [] supports
-  pure (name, size, deps)
+  --deps <- option []
+  pure ()
 
 word :: Parser Text
 word = T.pack <$> some letterChar
@@ -42,8 +42,6 @@ int :: Parser Int
 int = do
       change <- option id (negate <$ char '-')
       fromInteger . change <$> L.integer
-
-supports = string " -> "   *>  (T.pack <$> some letterChar) `sepBy` string ", "
 
 
 tup1 (a,b,c) = a
