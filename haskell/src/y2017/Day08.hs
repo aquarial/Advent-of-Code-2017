@@ -9,7 +9,6 @@ import           Text.Megaparsec
 import qualified Text.Megaparsec.Lexer as L
 import           Text.Megaparsec.Text  (Parser)
 
-import           Control.Monad
 import           Data.List
 import qualified Data.Map.Strict       as M
 import qualified Data.Set              as S
@@ -22,7 +21,9 @@ main = do
   case parse p "input08" input of
     Left  err   -> TIO.putStr $ T.pack $ parseErrorPretty err
     Right betterInput -> do
-      tprint $ partA betterInput
+      let (a,b) = partA betterInput
+      tprint $ a
+      tprint $ b
   return ()
 
 type Instruction = (Text, Int->Int, Text, (Int->Bool))
@@ -30,6 +31,7 @@ type Instruction = (Text, Int->Int, Text, (Int->Bool))
 p :: Parser [Instruction]
 p = line `sepBy` char '\n'
 
+line :: Parser Instruction
 line = do reg <- word
           space
           change <- (+) <$ string "inc" <|> subtract <$ string "dec"
