@@ -70,11 +70,10 @@ tup1 (a,b,c) = a
 tup2 (a,b,c) = b
 tup3 (a,b,c) = c
 
-partA xs = walk xs (M.empty)
+partA xs = walk xs (M.empty) 0
 
-walk ::[(Text, Int->Int, Text, (Int->Bool))] -> M.Map Text Int -> M.Map Text Int
-walk []                               m = m
-walk ((this, change, other, test):xs) m = walk xs (if test valother then M.insert this (change valthis) m else m)
+walk []                               m ma = (m, ma)
+walk ((this, change, other, test):xs) m ma = walk xs (if test valother then M.insert this (change valthis) m else m) (maximum [ma, valthis, valother])
   where
     valthis :: Int
     valthis = case M.lookup this m of
