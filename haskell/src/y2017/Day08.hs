@@ -35,7 +35,7 @@ comparitor ts | ts == "==" = (==)
               | ts == ">=" = (>=)
               | ts == "<=" = (<=)
 
-p :: Parser [(Text, Int->Int, Text, (Int->Bool))]
+p :: Parser [Instruction]
 p = line `sepBy` char '\n'
 
 line = do
@@ -64,10 +64,13 @@ int = do
 tup1 (a,b,c) = a
 tup2 (a,b,c) = b
 tup3 (a,b,c) = c
+-- type Instruction = (Text, Int->Int, Text, (Int->Bool))
 
+partA :: [Instruction] -> (Int, Int)
 partA xs = let (m, s) = walk xs (M.empty) 0
            in (maximum (M.elems m), s)
 
+walk ::[Instruction] -> M.Map Text Int -> Int -> (M.Map Text Int, Int)
 walk []                               m ma = (m, ma)
 walk ((this, change, other, test):xs) m ma = walk xs (if test valother then M.insert this (change valthis) m else m) (maximum [ma, valthis, valother])
   where
