@@ -68,12 +68,8 @@ partA xs = let (m, s) = walk xs (M.empty) 0
 
 walk ::[Instruction] -> M.Map Text Int -> Int -> (M.Map Text Int, Int)
 walk []                               m ma = (m, ma)
-walk ((this, change, other, test):xs) m ma = walk xs (if test valother then M.insert this (change valthis) m else m) (maximum [ma, valthis, valother])
+walk ((this, change, other, test):xs) m ma = walk xs (if test valother then withOp else m)  (maximum [ma, valthis, valother])
   where
-    valthis :: Int
-    valthis = case M.lookup this m of
-            Just v -> v
-            Nothing -> 0
-    valother = case M.lookup other m of
-            Just v -> v
-            Nothing -> 0
+    withOp   = M.insert this (change valthis) m
+    valthis  = M.findWithDefault 0 this m
+    valother = M.findWithDefault 0 other m
