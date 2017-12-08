@@ -9,6 +9,7 @@ import           Text.Megaparsec
 import qualified Text.Megaparsec.Lexer as L
 import           Text.Megaparsec.Text  (Parser)
 
+import           Control.Monad
 import           Data.List
 import qualified Data.Map.Strict       as M
 import qualified Data.Set              as S
