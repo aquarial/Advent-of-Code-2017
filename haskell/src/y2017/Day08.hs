@@ -29,8 +29,10 @@ main = do
       tprint $ partA betterInput
   return ()
 
-p :: Parser [()]
-p = line `sepBy` char '\n'
+p :: Parser [Int]
+p = int `sepBy` char '\t'
+-- do inpts <- int
+--    replicateM inpts $ line `sepBy` char '\n'
 
 line = do
   name <- word
