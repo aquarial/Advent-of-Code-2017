@@ -44,7 +44,7 @@ line = do reg <- word
           pure (reg, change size, other, (`comparer` limit))
 
 symb :: Parser Text
-symb = T.pack <$> some symbolChar
+symb = T.pack <$> some (oneOf ("!<>="::String))
 
 word :: Parser Text
 word = T.pack <$> some letterChar
