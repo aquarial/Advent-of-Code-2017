@@ -15,17 +15,12 @@ parser :: Parser Content
 parser = group <|> garbage
 
 group :: Parser Content
-group = do char '{'
-           parts <- many $ group <|> garbage
-                                 <|> C <$> satisfy (/= '}')
-           char '}'
-           pure $ Group parts
+group = Group <$> between (char '{') (char '}') parts
+  where parts = many $ group <|> garbage <|> C <$> satisfy (/= '}')
 
 garbage :: Parser Content
-garbage = do char '<'
-             parts <- many $ cancelled <|> C <$> satisfy (/= '>')
-             char '>'
-             pure $ Garbage parts
+garbage = Garbage <$> between (char '<') (char '>') parts
+  where parts = many $ cancelled <|> C <$> satisfy (/= '>')
 
 
 cancelled :: Parser Content
