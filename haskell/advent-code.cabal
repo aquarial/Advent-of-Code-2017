@@ -20,6 +20,8 @@ executable advent-code
                      , base64-bytestring
                      , bytestring
                      , containers
+                     , diagrams
+                     , diagrams-lib
                      , digits
                      , hashable
                      , lens
