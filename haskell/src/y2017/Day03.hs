@@ -16,11 +16,10 @@ main = do
 
 part1 :: Int -> Int
 part1 1 = 0
-part1 p = layer + abs((p - (4*layer^2 - 2*layer + 1)) `mod` layer)
+part1 n = layer + abs( ((n - 1) `mod` (2*layer)) - layer )
   where
-    layer = ceiling $ (sqrt n - 1) / 2
-    n = fromIntegral p
-
+    layer = ceiling $ 0.5 * (sqrt floatn - 1)
+    floatn = fromIntegral n
 
 
 
