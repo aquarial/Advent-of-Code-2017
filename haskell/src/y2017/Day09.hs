@@ -7,6 +7,31 @@ import qualified Data.Text.IO          as TIO
 import           Text.Megaparsec
 import           Text.Megaparsec.Text  (Parser)
 
+data Content = Group [Content] | Garbage [Content] | C Char | NA Char
+  deriving Show
+
+
+parser :: Parser Content
+parser = group <|> garbage
+
+group :: Parser Content
+group = do char '{'
+           parts <- many $ group <|> garbage
+                                 <|> C <$> satisfy (/= '}')
+           char '}'
+           pure $ Group parts
+
+garbage :: Parser Content
+garbage = do char '<'
+             parts <- many $ cancelled <|> C <$> satisfy (/= '>')
+             char '>'
+             pure $ Garbage parts
+
+
+cancelled :: Parser Content
+cancelled = NA <$> (char '!' >> anyChar)
+
+
 part1 :: Content -> Int
 part1 = walk 1
 
@@ -39,29 +64,4 @@ main = do
 
 tprint :: Show a => a -> IO ()
 tprint = TIO.putStrLn . T.pack . show
-
-
-data Content = Group [Content] | Garbage [Content] | C Char | NA Char
-  deriving Show
-
-
-parser :: Parser Content
-parser = group <|> garbage
-
-group :: Parser Content
-group = do char '{'
-           parts <- many $ group <|> garbage
-                                 <|> C <$> satisfy (/= '}')
-           char '}'
-           pure $ Group parts
-
-garbage :: Parser Content
-garbage = do char '<'
-             parts <- many $ cancelled <|> C <$> satisfy (/= '>')
-             char '>'
-             pure $ Garbage parts
-
-
-cancelled :: Parser Content
-cancelled = NA <$> (char '!' >> anyChar)
 
