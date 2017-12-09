@@ -9,16 +9,13 @@ import           Text.Megaparsec
 import qualified Text.Megaparsec.Lexer as L
 import           Text.Megaparsec.Text  (Parser)
 
-import           Control.Monad         (void)
 import           Data.List             hiding (group)
 import qualified Data.Map.Strict       as M
 import qualified Data.Set              as S
-import           Data.Tree             as T
 
 tprint :: Show a => a -> IO ()
 tprint = TIO.putStrLn . T.pack . show
 
-test :: Text -> (Group, Int)
 test x = case parse p "test" x of
            Left err -> error $ show err
            Right bi -> (bi, partA bi)
@@ -31,28 +28,35 @@ main = do
       tprint $ partA betterInput
   return ()
 
-p = group
+p = group <|> garbage
+
+data Content = Group [Content] | Garbage [Content] | C Char | NA Char
+  deriving Show
 
 
-type Forrest = [Group]
-data Group = Group Forrest | NA deriving Show
-
-group :: Parser Group
+group :: Parser Content
 group = do char '{'
-           parts <- many $ (NA <$ (char '!' >> anyChar)) <|> group
-                                                         <|> garbage
-                                                         <|> NA <$ satisfy (/= '}')
+           parts <- many $ (NA <$> (char '!' >> anyChar)) <|> group
+                                                          <|> garbage
+                                                          <|> C <$> satisfy (/= '}')
            char '}'
            pure $ Group parts
 
-garbage :: Parser Group
+garbage :: Parser Content
 garbage = do char '<'
-             many $ (char '!' >> anyChar) <|> satisfy (/= '>')
+             parts <- many $ (NA <$> (char '!' >> anyChar)) <|> C <$> satisfy (/= '>')
              char '>'
-             pure NA
+             pure $ Garbage parts
 
-partA = walk 1
+--partA = walk 1
+isChar (C _) = True
+isChar _     = False
 
-walk :: Int -> Group -> Int
-walk n NA         = 0
+partA (Group   xs) = sum (map partA (filter (not . isChar) xs ))
+partA (Garbage xs) = sum (map partA xs)
+partA (C _)  = 1
+partA (NA _) = 0
+
+walk :: Int -> Content -> Int
 walk n (Group xs) = n + sum (map (walk (n+1)) xs)
+walk n _          = 0
