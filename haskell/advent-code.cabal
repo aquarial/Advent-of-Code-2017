@@ -19,6 +19,7 @@ executable advent-code
   build-depends:       base >= 4.7 && < 5
                      , base64-bytestring
                      , bytestring
+                     , containers
                      , digits
                      , hashable
                      , lens
@@ -26,6 +27,5 @@ executable advent-code
                      , split
                      , text
                      , unordered-containers
-                     , containers
                      , vector
                      , wreq
