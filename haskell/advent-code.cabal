@@ -22,6 +22,7 @@ executable advent-code
                      , containers
                      , diagrams
                      , diagrams-lib
+                     , diagrams-svg
                      , digits
                      , hashable
                      , lens
