@@ -3,6 +3,9 @@ module DayTHEDAY where
 
 import           Data.ByteString       (ByteString)
 import qualified Data.ByteString       as B
+import qualified Data.ByteString.Base16 as B16
+
+import qualified Data.Bits             as Bits
 
 import           Data.Text             (Text)
 import qualified Data.Text             as T
@@ -14,7 +17,6 @@ import qualified Text.Megaparsec.Lexer as L
 import           Text.Megaparsec.Text  (Parser)
 
 import           Data.List
-
 import qualified Data.Map.Strict       as M
 import qualified Data.Set              as S
 
