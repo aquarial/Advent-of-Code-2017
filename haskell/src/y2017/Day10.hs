@@ -32,17 +32,12 @@ part1 = product . take 2 . unwind . rounds 1 (0, 0, [0..255])
 
 part2 :: [Int] -> ByteString
 part2 = encode . map (foldl Bits.xor 0) . blocks . unwind . rounds 64 (0,0,[0..255]) . (++[17,31,73,47,23])
-
-
-test = unwind $ rounds 1 (0,0,[0..4]) [3,4,1,5]
-
-encode :: [Int] -> ByteString
-encode = B16.encode .  B.pack . map fromIntegral
+  where
+    encode = B16.encode .  B.pack . map fromIntegral
 
 blocks :: [a] -> [[a]]
 blocks [] = []
 blocks xs = take 16 xs : blocks (drop 16 xs)
-
 
 
 rounds :: Int -> (Int, Int, [Int]) -> [Int] -> (Int, Int, [Int])
@@ -64,15 +59,6 @@ walk (startPos, skip, elems) (input:rest) = simplify $ walk (startPos+skip+input
 cycleL :: Int -> [a] -> [a]
 cycleL i xs = let il = i `mod` length xs
               in drop il xs ++ take il xs
-
-{-
-0 1 2 3 4
-3 4 2 1 0
-1 2 4 3 0
-3 0 1 2 4
-0 3 4 2 1
-
--}
 
 main :: IO ()
 main = do
