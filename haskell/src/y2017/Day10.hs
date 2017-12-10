@@ -27,21 +27,20 @@ int = do
       change <- option id (negate <$ char '-')
       fromInteger . change <$> L.integer
 
-part1 :: [Int] -> Integer
-part1 = product . take 2 . oneround
-
---part2 :: [Int] -> Text
-part2 xs = 3
-
-oneround xs = let (result, startPos) = walk 0 xs [0..255]
-              in cycleL startPos result
-
-walk :: Int -> [Int] -> [a] -> ([a], Int)
-walk skip []         elems = (elems, 0)
-walk skip (i:inputs) elems = shiftedStart <$> (walk (skip+1) inputs $ cycleL (i+skip) reved)
+part1 :: [Int] -> Int
+part1 = product . take 2 . third . rounds 1 (0, 0, [0..255])
   where
-    shiftedStart start = (start+skip+i) `mod` length elems
-    reved = reverse (take i elems) ++ drop i elems
+    third (_,_,x) = x
+
+rounds :: Int -> (Int, Int, [Int]) -> [Int] -> (Int, Int, [Int])
+rounds 0 state inputs = state
+rounds n state inputs = let newState = walk state inputs
+                        in rounds (n-1) newState inputs
+
+walk          state              []       = state
+walk (startPos, skip, elems) (input:rest) = walk (startPos+skip+input, skip+1, cycleL skip reversed) rest
+  where
+    reversed = reverse (take input elems) ++ drop input elems
 
 cycleL :: Int -> [a] -> [a]
 cycleL i xs = let il = i `mod` length xs
@@ -64,7 +63,7 @@ main = do
     Right betterInput -> do
       tprint $ part1 betterInput
 
-  tprint $ part2 $ map fromIntegral $ B.unpack $ TE.encodeUtf8 input
+  --tprint $ part2 $ map fromIntegral $ B.unpack $ TE.encodeUtf8 input
 
 tprint :: Show a => a -> IO ()
 tprint = TIO.putStrLn . T.pack . show
