@@ -28,19 +28,19 @@ int = do
       fromInteger . change <$> L.integer
 
 part1 :: [Int] -> Integer
-part1 = oneround
+part1 = product . take 2 . oneround
 
 --part2 :: [Int] -> Text
 part2 xs = 3
 
-oneround xs = product $ take 2 $ cycleL (-totDist) $ walk 0 xs [0..255]
-  where
-    totDist = floor (0.5 * l * (l+1)) + sum xs
-    l = fromIntegral $ length xs - 1
+oneround xs = let (result, startPos) = walk 0 xs [0..255]
+              in cycleL startPos result
 
-walk skip []         elems = elems
-walk skip (i:inputs) elems = walk (skip+1) inputs $ cycleL (i+skip) reved
+walk :: Int -> [Int] -> [a] -> ([a], Int)
+walk skip []         elems = (elems, 0)
+walk skip (i:inputs) elems = shiftedStart <$> (walk (skip+1) inputs $ cycleL (i+skip) reved)
   where
+    shiftedStart start = (start+skip+i) `mod` length elems
     reved = reverse (take i elems) ++ drop i elems
 
 cycleL :: Int -> [a] -> [a]
