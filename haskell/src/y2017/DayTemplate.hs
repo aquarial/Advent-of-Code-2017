@@ -13,20 +13,6 @@ import           Data.List
 import qualified Data.Map.Strict       as M
 import qualified Data.Set              as S
 
-tprint :: Show a => a -> IO ()
-tprint = TIO.putStrLn . T.pack . show
-
-main = do
-  input <- TIO.readFile "src/y2017/inputTHEDAY"
-  case parse p "testinputTHEDAY" input of
-    Left  err   -> TIO.putStr $ T.pack $ parseErrorPretty err
-    Right betterInput -> do
-      tprint $ partA betterInput
-  case parse p "inputTHEDAY" input of
-    Left  err   -> TIO.putStr $ T.pack $ parseErrorPretty err
-    Right betterInput -> do
-      tprint $ partA betterInput
-  return ()
 
 p :: Parser [()]
 p = line `sepBy` char '\n'
@@ -48,8 +34,26 @@ int = do
       fromInteger . change <$> L.integer
 
 
-tup1 (a,b,c) = a
-tup2 (a,b,c) = b
-tup3 (a,b,c) = c
-
 partA xs = xs
+
+
+
+
+main :: IO ()
+main = do
+  input <- TIO.readFile "src/y2017/inputTHEDAY"
+  case parse p "inputTHEDAY" input of
+    Left  err   -> TIO.putStr $ T.pack $ parseErrorPretty err
+    Right betterInput -> do
+      tprint $ partA betterInput
+  return ()
+
+
+test :: Text -> IO ()
+test input = case parse p "test" input of
+               Left  err -> TIO.putStr $ T.pack $ parseErrorPretty err
+               Right bi  -> tprint $ partA bi
+
+
+tprint :: Show a => a -> IO ()
+tprint = TIO.putStrLn . T.pack . show
