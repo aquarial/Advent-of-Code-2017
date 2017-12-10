@@ -1,8 +1,12 @@
 {-# LANGUAGE OverloadedStrings #-}
 module DayTHEDAY where
 
+import           Data.ByteString       (ByteString)
+import qualified Data.ByteString       as B
+
 import           Data.Text             (Text)
 import qualified Data.Text             as T
+import qualified Data.Text.Encoding    as TE
 import qualified Data.Text.IO          as TIO
 
 import           Text.Megaparsec
@@ -10,6 +14,7 @@ import qualified Text.Megaparsec.Lexer as L
 import           Text.Megaparsec.Text  (Parser)
 
 import           Data.List
+
 import qualified Data.Map.Strict       as M
 import qualified Data.Set              as S
 
@@ -22,8 +27,13 @@ int = do
       change <- option id (negate <$ char '-')
       fromInteger . change <$> L.integer
 
+part1 :: [Int] -> Integer
+part1 = oneround
 
-partA xs = product $ take 2 $ cycleL (-totDist) $ walk 0 xs [0..255]
+--part2 :: [Int] -> Text
+part2 xs = 3
+
+oneround xs = product $ take 2 $ cycleL (-totDist) $ walk 0 xs [0..255]
   where
     totDist = floor (0.5 * l * (l+1)) + sum xs
     l = fromIntegral $ length xs - 1
@@ -52,15 +62,9 @@ main = do
   case parse p "inputTHEDAY" input of
     Left  err   -> TIO.putStr $ T.pack $ parseErrorPretty err
     Right betterInput -> do
-      tprint $ partA betterInput
-  return ()
+      tprint $ part1 betterInput
 
-
-test :: Text -> IO ()
-test input = case parse p "test" input of
-               Left  err -> TIO.putStr $ T.pack $ parseErrorPretty err
-               Right bi  -> tprint $ partA bi
-
+  tprint $ part2 $ map fromIntegral $ B.unpack $ TE.encodeUtf8 input
 
 tprint :: Show a => a -> IO ()
 tprint = TIO.putStrLn . T.pack . show
