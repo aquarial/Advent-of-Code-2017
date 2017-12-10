@@ -1,24 +1,24 @@
 {-# LANGUAGE OverloadedStrings #-}
 module DayTHEDAY where
 
-import           Data.ByteString       (ByteString)
-import qualified Data.ByteString       as B
+import           Data.ByteString        (ByteString)
+import qualified Data.ByteString        as B
 import qualified Data.ByteString.Base16 as B16
 
-import qualified Data.Bits             as Bits
+import qualified Data.Bits              as Bits
 
-import           Data.Text             (Text)
-import qualified Data.Text             as T
-import qualified Data.Text.Encoding    as TE
-import qualified Data.Text.IO          as TIO
+import           Data.Text              (Text)
+import qualified Data.Text              as T
+import qualified Data.Text.Encoding     as TE
+import qualified Data.Text.IO           as TIO
 
 import           Text.Megaparsec
-import qualified Text.Megaparsec.Lexer as L
-import           Text.Megaparsec.Text  (Parser)
+import qualified Text.Megaparsec.Lexer  as L
+import           Text.Megaparsec.Text   (Parser)
 
 import           Data.List
-import qualified Data.Map.Strict       as M
-import qualified Data.Set              as S
+import qualified Data.Map.Strict        as M
+import qualified Data.Set               as S
 
 
 p1 :: Parser [Int]
