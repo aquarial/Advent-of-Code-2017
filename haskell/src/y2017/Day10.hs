@@ -24,9 +24,26 @@ import qualified Data.Set              as S
 p1 :: Parser [Int]
 p1 = ((fromInteger <$> L.integer) `sepBy` char ',')
 
+p2 :: Text -> [Int]
+p2 = map fromIntegral . B.unpack . TE.encodeUtf8
 
 part1 :: [Int] -> Int
 part1 = product . take 2 . unwind . rounds 1 (0, 0, [0..255])
+
+part2 :: [Int] -> ByteString
+part2 = encode . map (foldl Bits.xor 0) . blocks . unwind . rounds 64 (0,0,[0..255]) . (++[17,31,73,47,23])
+
+
+test = unwind $ rounds 1 (0,0,[0..4]) [3,4,1,5]
+
+encode :: [Int] -> ByteString
+encode = B16.encode .  B.pack . map fromIntegral
+
+blocks :: [a] -> [[a]]
+blocks [] = []
+blocks xs = take 16 xs : blocks (drop 16 xs)
+
+
 
 rounds :: Int -> (Int, Int, [Int]) -> [Int] -> (Int, Int, [Int])
 rounds 0 state inputs = state
@@ -65,7 +82,7 @@ main = do
     Right betterInput -> do
       tprint $ part1 betterInput
 
-  --tprint $ part2 $ map fromIntegral $ B.unpack $ TE.encodeUtf8 input
+  tprint $ part2 $ p2 input
 
 tprint :: Show a => a -> IO ()
 tprint = TIO.putStrLn . T.pack . show
