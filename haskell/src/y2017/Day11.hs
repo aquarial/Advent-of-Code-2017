@@ -19,16 +19,18 @@ import qualified Data.Map.Strict       as M
 import qualified Data.Set              as S
 
 
-p :: Parser [()]
-p = line `sepBy` char '\n'
+p :: Parser [Move]
+p = (move <$> word)`sepBy` char ','
 
-line = do
-  name <- word
-  string " ("
-  size <- int
-  string ")"
-  --deps <- option []
-  pure ()
+data Move = S | SW | NW | N | NE | SE
+
+move :: Text -> Move
+move "se" = SE
+move "s" = S
+move "sw" = SW
+move "ne" = NE
+move "nw" = NW
+move "n" = N
 
 word :: Parser Text
 word = T.pack <$> some letterChar
@@ -38,7 +40,18 @@ int = do
       change <- option id (negate <$ char '-')
       fromInteger . change <$> L.integer
 
-partA = id
+partA = dist . walk (0,0)
+
+
+walk (a,b) (S:xs) = walk (a,b+1) xs
+walk (a,b) (SE:xs) = walk (a+1,b) xs
+walk (a,b) (SW:xs) = walk (a-1,b+1) xs
+walk (a,b) (N:xs) = walk (a,b-1) xs
+walk (a,b) (NE:xs) = walk (a+1,b-1) xs
+walk (a,b) (NW:xs) = walk (a-1,b) xs
+walk  z      []      = z
+
+dist (a,b) = (abs a + abs (a + b) + abs (b)) / 2
 
 test input = case parse p "test" input of
                Left  err -> TIO.putStr $ T.pack $ parseErrorPretty err
