@@ -12,16 +12,16 @@ import           Text.Megaparsec.Text  (Parser)
 data Move = S | SW | NW | N | NE | SE
 
 p :: Parser [Move]
-p = (move <$> word)`sepBy` char ','
+p = (move <$> word) `sepBy` char ','
 
 
 move :: Text -> Move
 move "se" = SE
-move "s" = S
+move "s"  = S
 move "sw" = SW
 move "ne" = NE
 move "nw" = NW
-move "n" = N
+move "n"  = N
 
 word :: Parser Text
 word = T.pack <$> some letterChar
@@ -32,7 +32,7 @@ part1 = dist . foldl walk (0,0)
 part2 :: [Move] -> Double
 part2 = maximum . map dist . scanl walk (0,0)
 
-dist (a,b) = (abs a + abs (a + b) + abs (b)) / 2
+dist (a,b) = (abs a + abs (a + b) + abs b) / 2
 
 walk (a,b) S  = (a,  b+1)
 walk (a,b) SE = (a+1,b)
