@@ -40,16 +40,16 @@ int = do
       change <- option id (negate <$ char '-')
       fromInteger . change <$> L.integer
 
-partA = dist . walk (0,0)
+partA = maximum . map dist . walk (0,0)
 
 
-walk (a,b) (S:xs) = walk (a,b+1) xs
-walk (a,b) (SE:xs) = walk (a+1,b) xs
-walk (a,b) (SW:xs) = walk (a-1,b+1) xs
-walk (a,b) (N:xs) = walk (a,b-1) xs
-walk (a,b) (NE:xs) = walk (a+1,b-1) xs
-walk (a,b) (NW:xs) = walk (a-1,b) xs
-walk  z      []      = z
+walk (a,b) (S:xs) = (a,b):walk (a,b+1) xs
+walk (a,b) (SE:xs) = (a,b):walk (a+1,b) xs
+walk (a,b) (SW:xs) = (a,b):walk (a-1,b+1) xs
+walk (a,b) (N:xs) =  (a,b):walk (a,b-1) xs
+walk (a,b) (NE:xs) = (a,b):walk (a+1,b-1) xs
+walk (a,b) (NW:xs) = (a,b):walk (a-1,b) xs
+walk  z      []      = [z]
 
 dist (a,b) = (abs a + abs (a + b) + abs (b)) / 2
 
