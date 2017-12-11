@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module DayTHEDAY where
+module Day10 where
 
 import           Data.ByteString        (ByteString)
 import qualified Data.ByteString        as B
@@ -63,7 +63,7 @@ cycleL i xs = let il = i `mod` length xs
 main :: IO ()
 main = do
   let input = "63,144,180,149,1,255,167,84,125,65,188,0,2,254,229,24"
-  case parse p1 "inputTHEDAY" input of
+  case parse p1 "input10" input of
     Left  err   -> TIO.putStr $ T.pack $ parseErrorPretty err
     Right betterInput -> do
       tprint $ part1 betterInput
