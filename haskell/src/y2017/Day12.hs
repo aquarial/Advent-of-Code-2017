@@ -13,57 +13,39 @@ import           Text.Megaparsec.Text  (Parser)
 import           Data.List
 import qualified Data.Map.Strict       as M
 import qualified Data.HashSet          as S
-
-
+import qualified Data.Graph            as G
 
 type Comm = (Int, [Int])
 
-p :: Parser [Comm]
-p = line `sepBy` char '\n'
+p :: Parser (G.Graph)
+p = buildgraph <$> (line `sepBy` char '\n')
 
-line = do
-  name <- int
-  string " <-> "
-  targets <- int `sepBy` string ", "
-  pure (name, targets)
+buildgraph :: [Comm] -> G.Graph
+buildgraph xs = G.buildG (0, fst $ last xs) (concatMap mkedges xs)
+  where
+    mkedges (node,connected) = zip (repeat node) connected
+
+line :: Parser Comm
+line = (,) <$> (int <* string " <-> ") <*> (int `sepBy` string ", ")
 
 int :: Parser Int
 int = do change <- option id (negate <$ char '-')
          fromInteger . change <$> L.integer
 
+part1 :: G.Graph -> Int
+part1 g = length $ G.reachable g 0
 
-test input = case parse p "test" input of
-               Left  err -> error $ parseErrorPretty err
-               Right bi  -> partBetter bi
-
-
-
-partA = last . take 2000 . walk []
---partA = take 10 . walk []
-
-chunks [] = []
-chunks (x:xs) = x : chunks (drop 100 xs)
-
---walk :: [S.Set Int] -> [Comm] -> [Int]
-walk !ss ((!n,!ts):xs) = if not (any (\s -> S.member n s) ss)
-                         then length ss:walk ss2 (xs++[(n,ts)])
-                         else length ss:walk ((foldl1 S.union (filter (\s -> S.member n s) ss2))
-                                           :
-                                           (filter (\s -> not (S.member n s)) ss2)) (xs++[(n,ts)])
-  where
-    ss2 = S.fromList(n:(ts::[Int])) : ss
-
-
-
+part2 :: G.Graph -> Int
+part2 g = length $ G.scc g
 
 main :: IO ()
 main = do
   input <- TIO.readFile "src/y2017/input12"
   case parse p "input12" input of
-    Left  err   -> TIO.putStr $ T.pack $ parseErrorPretty err
-    Right betterInput -> do
-      tprint $ partA betterInput
-  return ()
+    Left err -> TIO.putStr $ T.pack $ parseErrorPretty err
+    Right bi -> do
+      tprint $ part1 bi
+      tprint $ part2 bi
 
 tprint :: Show a => a -> IO ()
 tprint = TIO.putStrLn . T.pack . show
