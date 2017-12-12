@@ -1,3 +1,4 @@
+{-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE OverloadedStrings #-}
 module Day12 where
 
@@ -11,7 +12,7 @@ import           Text.Megaparsec.Text  (Parser)
 
 import           Data.List
 import qualified Data.Map.Strict       as M
-import qualified Data.Set              as S
+import qualified Data.HashSet          as S
 
 
 
@@ -32,12 +33,20 @@ int = do
       fromInteger . change <$> L.integer
 
 
-partA = last . take 200000 . walk (S.fromList [0])
+partA = last . take 2000 . walk []
+--partA = take 10 . walk []
 
+chunks [] = []
+chunks (x:xs) = x : chunks (drop 100 xs)
 
-walk s ((n,ts):xs) = if S.member n s || any (\x -> S.member x s) ts
-                     then S.size s : walk (S.union s (S.fromList (n:ts))) (xs++[(n,ts)])
-                     else S.size s : walk s (xs++[(n,ts)])
+--walk :: [S.Set Int] -> [Comm] -> [Int]
+walk !ss ((!n,!ts):xs) = if not (any (\s -> S.member n s) ss)
+                         then length ss:walk ss2 (xs++[(n,ts)])
+                         else  length ss:walk ((foldl1 S.union (filter (\s -> S.member n s) ss2))
+                                           :
+                                           (filter (\s -> not (S.member n s)) ss2)) (xs++[(n,ts)])
+  where
+    ss2 = S.fromList(n:(ts::[Int])) : ss
 
 
 
@@ -51,11 +60,9 @@ main = do
       tprint $ partA betterInput
   return ()
 
-
-test :: Text -> IO ()
 test input = case parse p "test" input of
-               Left  err -> TIO.putStr $ T.pack $ parseErrorPretty err
-               Right bi  -> tprint $ partA bi
+               Left  err -> error $ parseErrorPretty err
+               Right bi  -> partA bi
 
 
 tprint :: Show a => a -> IO ()
