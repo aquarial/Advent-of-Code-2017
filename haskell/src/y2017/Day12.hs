@@ -14,28 +14,28 @@ import qualified Data.Map.Strict       as M
 import qualified Data.HashSet          as S
 import qualified Data.Graph            as G
 
-type Comm = (Int, [Int])
-
 p :: Parser (G.Graph)
 p = buildgraph <$> line `sepEndBy` char '\n'
 
-buildgraph :: [Comm] -> G.Graph
-buildgraph xs = G.buildG (0, fst $ last xs) (concatMap mkedges xs)
-  where
-    mkedges (node,connected) = zip (repeat node) connected
-
-line :: Parser Comm
+line :: Parser (Int, [Int])
 line = (,) <$> (int <* string " <-> ") <*> (int `sepBy` string ", ")
 
 int :: Parser Int
 int = do change <- option id (negate <$ char '-')
          fromInteger . change <$> L.integer
 
+buildgraph :: [(Int, [Int])] -> G.Graph
+buildgraph xs = G.buildG (0, fst $ last xs) alledges
+  where
+    alledges = concatMap mkedges xs
+    mkedges (node,connected) = zip (repeat node) connected
+
 part1 :: G.Graph -> Int
 part1 g = length $ G.reachable g 0
 
 part2 :: G.Graph -> Int
 part2 g = length $ G.scc g
+-- StronglyConnectedComponents
 
 main :: IO ()
 main = do
