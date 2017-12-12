@@ -15,7 +15,7 @@ import qualified Data.HashSet          as S
 import qualified Data.Graph            as G
 
 p :: Parser [()]
-p = line `sepBy` char '\n'
+p = line `sepEndBy` char '\n'
 
 line = do a <- int
           string " - "

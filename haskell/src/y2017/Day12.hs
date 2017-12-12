@@ -17,7 +17,7 @@ import qualified Data.Graph            as G
 type Comm = (Int, [Int])
 
 p :: Parser (G.Graph)
-p = buildgraph <$> (line `sepBy` char '\n')
+p = buildgraph <$> line `sepEndBy` char '\n'
 
 buildgraph :: [Comm] -> G.Graph
 buildgraph xs = G.buildG (0, fst $ last xs) (concatMap mkedges xs)
