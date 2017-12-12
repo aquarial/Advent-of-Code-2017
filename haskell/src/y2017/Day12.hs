@@ -9,9 +9,6 @@ import           Text.Megaparsec
 import qualified Text.Megaparsec.Lexer as L
 import           Text.Megaparsec.Text  (Parser)
 
-import           Data.List
-import qualified Data.Map.Strict       as M
-import qualified Data.HashSet          as S
 import qualified Data.Graph            as G
 
 p :: Parser (G.Graph)
