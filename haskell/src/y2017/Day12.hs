@@ -15,20 +15,16 @@ import qualified Data.Set              as S
 
 
 
+type Comm = (Int, [Int])
 
-p :: Parser [()]
+p :: Parser [Comm]
 p = line `sepBy` char '\n'
 
 line = do
-  name <- word
-  string " ("
-  size <- int
-  string ")"
-  --deps <- option []
-  pure ()
-
-word :: Parser Text
-word = T.pack <$> some letterChar
+  name <- int
+  string " <-> "
+  targets <- int `sepBy` (string (", "::String))
+  pure (name, targets)
 
 int :: Parser Int
 int = do
@@ -36,7 +32,12 @@ int = do
       fromInteger . change <$> L.integer
 
 
-partA xs = xs
+partA = last . take 200000 . walk (S.fromList [0])
+
+
+walk s ((n,ts):xs) = if S.member n s || any (\x -> S.member x s) ts
+                     then S.size s : walk (S.union s (S.fromList (n:ts))) (xs++[(n,ts)])
+                     else S.size s : walk s (xs++[(n,ts)])
 
 
 
