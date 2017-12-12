@@ -24,13 +24,18 @@ p = line `sepBy` char '\n'
 line = do
   name <- int
   string " <-> "
-  targets <- int `sepBy` (string (", "::String))
+  targets <- int `sepBy` string ", "
   pure (name, targets)
 
 int :: Parser Int
-int = do
-      change <- option id (negate <$ char '-')
-      fromInteger . change <$> L.integer
+int = do change <- option id (negate <$ char '-')
+         fromInteger . change <$> L.integer
+
+
+test input = case parse p "test" input of
+               Left  err -> error $ parseErrorPretty err
+               Right bi  -> partBetter bi
+
 
 
 partA = last . take 2000 . walk []
@@ -42,7 +47,7 @@ chunks (x:xs) = x : chunks (drop 100 xs)
 --walk :: [S.Set Int] -> [Comm] -> [Int]
 walk !ss ((!n,!ts):xs) = if not (any (\s -> S.member n s) ss)
                          then length ss:walk ss2 (xs++[(n,ts)])
-                         else  length ss:walk ((foldl1 S.union (filter (\s -> S.member n s) ss2))
+                         else length ss:walk ((foldl1 S.union (filter (\s -> S.member n s) ss2))
                                            :
                                            (filter (\s -> not (S.member n s)) ss2)) (xs++[(n,ts)])
   where
@@ -59,11 +64,6 @@ main = do
     Right betterInput -> do
       tprint $ partA betterInput
   return ()
-
-test input = case parse p "test" input of
-               Left  err -> error $ parseErrorPretty err
-               Right bi  -> partA bi
-
 
 tprint :: Show a => a -> IO ()
 tprint = TIO.putStrLn . T.pack . show
