@@ -30,10 +30,7 @@ int :: Parser Int
 int = do change <- option id (negate <$ char '-')
          fromInteger . change <$> L.integer
 
-part1 xs = findIndex (==0) $ map (\o -> length $ walk2 o xs) [0..]
-
-cost :: Int -> [Wall] -> Int
-cost offset = sum . map (\w -> _depth w * _range w) . walk2 offset
+part1 xs = findIndex null $ map (\o -> walk2 o xs) [0..]
 
 walk2 :: Int -> [Wall] -> [Wall]
 walk2 offset xs = filter willBeZero xs
