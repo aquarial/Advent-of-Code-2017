@@ -14,6 +14,9 @@ import qualified Data.Map.Strict       as M
 import qualified Data.HashSet          as S
 import qualified Data.Graph            as G
 
+parta xs = xs
+
+
 p :: Parser [()]
 p = line `sepEndBy` char '\n'
 
@@ -29,7 +32,6 @@ int :: Parser Int
 int = do change <- option id (negate <$ char '-')
          fromInteger . change <$> L.integer
 
-part1 g = g
 
 main :: IO ()
 main = do
@@ -37,7 +39,7 @@ main = do
   case parse p "inputDAY" input of
     Left err -> TIO.putStr $ T.pack $ parseErrorPretty err
     Right bi -> do
-      tprint $ part1 bi
+      tprint $ parta bi
 
 tprint :: Show a => a -> IO ()
 tprint = TIO.putStrLn . T.pack . show
