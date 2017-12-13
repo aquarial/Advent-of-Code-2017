@@ -10,9 +10,6 @@ import qualified Text.Megaparsec.Lexer as L
 import           Text.Megaparsec.Text  (Parser)
 
 import           Data.List
-import qualified Data.Map.Strict       as M
-import qualified Data.HashSet          as S
-import qualified Data.Graph            as G
 
 data Wall = Wall { _depth :: Int
                  , _range :: Int } deriving Show
