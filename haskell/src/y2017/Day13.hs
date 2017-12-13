@@ -15,11 +15,7 @@ import qualified Data.HashSet          as S
 import qualified Data.Graph            as G
 
 data Wall = Wall { _depth :: Int
-                 , _range :: Int
-                 , _state :: Int
-                 , _dir :: Dir} deriving Show
-
-data Dir = U | D deriving Show
+                 , _range :: Int } deriving Show
 
 p :: Parser [Wall]
 p = line `sepEndBy` char '\n'
@@ -28,25 +24,21 @@ line :: Parser Wall
 line = do d <- int
           string ": "
           r <- int
-          pure $ Wall d r 0 D
+          pure $ Wall d r
 
 int :: Parser Int
 int = do change <- option id (negate <$ char '-')
          fromInteger . change <$> L.integer
 
-part1 = walk $ -1
+part1 xs = findIndex (==0) $ map (\o -> length $ walk2 o xs) [0..]
 
-data TRI a b c = A a | B b | C c deriving (Show)
+cost :: Int -> [Wall] -> Int
+cost offset = sum . map (\w -> _depth w * _range w) . walk2 offset
 
-walk pos []    = 0
-walk pos (w:walls) | _depth w > pos+1 =  walk (pos+1) (map step (w:walls))
-                   | _state w == 0    = _depth w * _range w + walk (pos+1) (map step walls)
-                   | otherwise        =  walk (pos+1) (map step walls)
---_depth w * _range w
-
-step :: Wall -> Wall
-step (Wall d r s U) = if s-1 <  0 then Wall d r (s+1) D else Wall d r (s-1) U
-step (Wall d r s D) = if s+1 >= r then Wall d r (s-1) U else Wall d r (s+1) D
+walk2 :: Int -> [Wall] -> [Wall]
+walk2 offset xs = filter willBeZero xs
+  where
+    willBeZero (Wall d r) = (d+offset) `mod` (2*(r-1)) == 0
 
 main :: IO ()
 main = do
@@ -54,6 +46,7 @@ main = do
   case parse p "input13" input of
     Left err -> TIO.putStr $ T.pack $ parseErrorPretty err
     Right bi -> do
+      --tprint $ walk2 0 bi
       tprint $ part1 bi
 
 tprint :: Show a => a -> IO ()
