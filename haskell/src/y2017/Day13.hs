@@ -17,6 +17,18 @@ import qualified Data.Graph            as G
 data Wall = Wall { _depth :: Int
                  , _range :: Int } deriving Show
 
+part1 :: [Wall] -> Int
+part1 ws = sum $ map (\(Wall d r) -> d*r) $ findCatches 0 ws
+
+part2 :: [Wall] -> Maybe Int
+part2 ws = findIndex null $ [findCatches o ws | o <- [0..]]
+
+findCatches :: Int -> [Wall] -> [Wall]
+findCatches offset = filter willBeZero
+  where
+    willBeZero (Wall d r) = (d+offset) `mod` (2*(r-1)) == 0
+
+
 p :: Parser [Wall]
 p = line `sepEndBy` char '\n'
 
@@ -30,12 +42,6 @@ int :: Parser Int
 int = do change <- option id (negate <$ char '-')
          fromInteger . change <$> L.integer
 
-part1 xs = findIndex null $ map (\o -> walk2 o xs) [0..]
-
-walk2 :: Int -> [Wall] -> [Wall]
-walk2 offset xs = filter willBeZero xs
-  where
-    willBeZero (Wall d r) = (d+offset) `mod` (2*(r-1)) == 0
 
 main :: IO ()
 main = do
@@ -43,8 +49,8 @@ main = do
   case parse p "input13" input of
     Left err -> TIO.putStr $ T.pack $ parseErrorPretty err
     Right bi -> do
-      --tprint $ walk2 0 bi
       tprint $ part1 bi
+      tprint $ part2 bi
 
 tprint :: Show a => a -> IO ()
 tprint = TIO.putStrLn . T.pack . show
