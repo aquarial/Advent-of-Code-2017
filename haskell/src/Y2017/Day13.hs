@@ -23,8 +23,7 @@ part2 ws = findIndex null $ [findCatches o ws | o <- [0..]]
 findCatches :: Int -> [Wall] -> [Wall]
 findCatches offset = filter willBeZero
   where
-    willBeZero (Wall d r) = (d+offset) `mod` (2*(r-1)) == 0
-
+    willBeZero (Wall d r) = (d+offset) `rem` (2*(r-1)) == 0
 
 p :: Parser [Wall]
 p = line `sepEndBy` char '\n'
@@ -46,7 +45,7 @@ main = do
   case parse p "input13" input of
     Left err -> TIO.putStr $ T.pack $ parseErrorPretty err
     Right bi -> do
-      tprint $ part1 bi
+      --tprint $ part1 bi
       tprint $ part2 bi
 
 tprint :: Show a => a -> IO ()

@@ -84,6 +84,3 @@ findUniqueWeight programs weights = case filter (snd) $ zip programs $ map (/=ex
                                       _           -> Nothing
   where
     expected = ordinary weights
-
-
-
