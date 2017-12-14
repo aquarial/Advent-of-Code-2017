@@ -37,14 +37,13 @@ sequence_ $ map putStrLn $ map (take 10) $ take 10 $ gridlist "flqrgnkx"
 -}
 search :: S.HashSet (Int,Int) -> [(Int,Int)] -> A.Array (Int,Int) Char -> S.HashSet (Int,Int)
 search s []     _    = s
-search s (p:ps) grid = search ss (filteredneigh ++ ps) grid
-  where
-    neighs (x,y) = filter inrange [(x+dx,y+dy) | dx <- [-1..1], dy <- [-1..1]]
-    filteredneigh = filter (\i -> grid A.!i == '1' && not (S.member i ss)) $ neighs p
-    ss = S.insert p s
-    --sameneigh p = filter (\i -> grid A.! i == grid A.! p) $ filter inrange $ neigh p
-    inrange = A.inRange ((0,0),(127,127))
-    --neigh (x,y) = filter (not . flip S.member ss) [(x+dx,y+dy) | dx <- [-1..1], dy <- [-1..1]]
+search s (p:ps) grid = search (S.insert p s) (filteredneigh s grid p ++ ps) grid
+
+neighs (x,y) = filter inrange [(x+dx,y+dy) | dx <- [-1..1], dy <- [-1..1], dx*dy==0]
+filteredneigh s grid p = filter (\i -> grid A.!i == '1' && not (S.member i s)) $ neighs p
+--sameneigh p = filter (\i -> grid A.! i == grid A.! p) $ filter inrange $ neigh p
+inrange = A.inRange ((0,0),(127,127))
+--neigh (x,y) = filter (not . flip S.member ss) [(x+dx,y+dy) | dx <- [-1..1], dy <- [-1..1]]
 
 gridarray :: Text -> A.Array (Int, Int) Char
 gridarray = A.listArray ((0,0), (127,127)) . foldl (++) [] . gridlist
@@ -62,7 +61,7 @@ normalize i = replicate (4 - length i) '0' ++ i
 --map popCount $ mconcat
 
 main :: IO ()
-main = do tprint $ parta "flqrgnkx"
+main = do tprint $ parta "ffayrhll"
 
 tprint :: Show a => a -> IO ()
 tprint = TIO.putStrLn . T.pack . show
