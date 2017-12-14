@@ -35,6 +35,9 @@ part2 = encode . map (foldl Bits.xor 0) . blocks . unwind . rounds 64 (0,0,[0..2
   where
     encode = B16.encode .  B.pack . map fromIntegral
 
+hash :: Text -> ByteString
+hash = part2 . p2
+
 blocks :: [a] -> [[a]]
 blocks [] = []
 blocks xs = take 16 xs : blocks (drop 16 xs)
