@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module DayDAY where
+module Y2017.DayDAY where
 
 import           Data.Text             (Text)
 import qualified Data.Text             as T

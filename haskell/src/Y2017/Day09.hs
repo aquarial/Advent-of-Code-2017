@@ -1,4 +1,4 @@
-module Day09 where
+module Y2017.Day09 where
 
 import qualified Data.Text             as T
 import qualified Data.Text.IO          as TIO
