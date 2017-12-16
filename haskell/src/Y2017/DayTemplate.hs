@@ -35,7 +35,7 @@ int = do change <- option id (negate <$ char '-')
 
 main :: IO ()
 main = do
-  input <- TIO.readFile "src/y2017/inputDAY"
+  input <- TIO.readFile "src/Y2017/inputDAY"
   case parse p "inputDAY" input of
     Left err -> TIO.putStr $ T.pack $ parseErrorPretty err
     Right bi -> do
