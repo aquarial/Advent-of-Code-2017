@@ -16,10 +16,14 @@ import qualified Data.Graph            as G
 
 data Move = Spin Int | Exchange Int Int | Partner Char Char
 
-parta :: [Move] -> [Char]
-parta = foldl' domove dancers
-  where
-    dancers = ['a'..'p']
+parta moves = iterate (dance moves) ['a'..'p'] !! ((10^9) `mod` loop)
+  where loop = findloop $ iterate (dance moves) ['a'..'p']
+
+findloop xs = walk 0 S.empty xs
+  where walk n s (x:xs) = if S.member x s then n else walk (n+1) (S.insert x s) xs
+
+dance :: Foldable t => t Move -> [Char] -> [Char]
+dance moves ds = foldl' domove ds moves
 
 domove ds (Spin i) = reverse $ rotateL i $ reverse ds
 domove ds (Exchange a b) = replace b (ds!!a) $ replace a (ds!!b) ds
