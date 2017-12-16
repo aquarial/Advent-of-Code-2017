@@ -22,43 +22,28 @@ import qualified Data.HashSet          as S
 import qualified Data.Graph            as G
 
 parta :: Text -> Int
-parta = walk (0,0) S.empty 0 . gridarray
+parta = length . G.stronglyConnComp . buildgraph . gridlist
 
-walk :: (Int, Int) -> S.HashSet (Int, Int) -> Int -> A.Array (Int, Int) Char -> Int
-walk (_,128) _  acc  _   = acc
-walk (128,y) seen acc grid = walk (0,y+1) seen acc grid
-walk (x  ,y) seen acc grid | S.member (x,y) seen = walk (x+1,y) seen acc grid
-                           | grid A.! (x,y) == '0' = walk (x+1,y) seen acc grid
-                           | otherwise           = walk (x+1,y) (search seen [(x,y)] grid) (acc+1) grid
+type Coord = (Int,Int)
 
-{-
-search S.empty [(4,2)] $ gridarray "flqrgnkx"
-sequence_ $ map putStrLn $ map (take 10) $ take 10 $ gridlist "flqrgnkx"
--}
-search :: S.HashSet (Int,Int) -> [(Int,Int)] -> A.Array (Int,Int) Char -> S.HashSet (Int,Int)
-search s []     _    = s
-search s (p:ps) grid = search (S.insert p s) (filteredneigh s grid p ++ ps) grid
+buildgraph :: [[Char]] -> [(Char, Coord, [Coord])]
+buildgraph cs = [(cs!!x!!y, (x,y), filter isone (neighs (x,y))) | x <- [0..length cs - 1]
+                                                                , y <- [0..length cs - 1]
+                                                                , isone (x,y)]
+  where isone (x,y) = cs!!x!!y == '1'
 
-neighs (x,y) = filter inrange [(x+dx,y+dy) | dx <- [-1..1], dy <- [-1..1], dx*dy==0]
-filteredneigh s grid p = filter (\i -> grid A.!i == '1' && not (S.member i s)) $ neighs p
---sameneigh p = filter (\i -> grid A.! i == grid A.! p) $ filter inrange $ neigh p
-inrange = A.inRange ((0,0),(127,127))
---neigh (x,y) = filter (not . flip S.member ss) [(x+dx,y+dy) | dx <- [-1..1], dy <- [-1..1]]
-
-gridarray :: Text -> A.Array (Int, Int) Char
-gridarray = A.listArray ((0,0), (127,127)) . foldl (++) [] . gridlist
+neighs (x,y) = filter inrange [(x+dx,y+dy) | dx <- [-1..1], dy <- [-1..1], dx*dy==0, dx /= dy]
+  where inrange = A.inRange ((0,0),(127,127))
 
 gridlist :: Text -> [[Char]]
-gridlist x = map (free . hash) [ x <> "-" <> t | t <- map (T.pack . show) [0..127]]
+gridlist x = parMap rpar (tobinarystring . hash) [ x <> "-" <> t | t <- map (T.pack . show) [0..127]]
 
-free :: ByteString -> [Char]
-free =  concatMap tobin . map fromhex . C8.unpack
-
-fromhex x = fst $ head $ readHex [x]
-tobin x = normalize $ showIntAtBase 2 intToDigit x ""
-normalize i = replicate (4 - length i) '0' ++ i
-
---map popCount $ mconcat
+tobinarystring :: ByteString -> [Char]
+tobinarystring =  concatMap tobin . map fromhex . C8.unpack
+  where
+    fromhex x = fst $ head $ readHex [x]
+    tobin x = normalize $ showIntAtBase 2 intToDigit x ""
+    normalize i = replicate (4 - length i) '0' ++ i
 
 main :: IO ()
 main = do tprint $ parta "ffayrhll"
