@@ -18,11 +18,14 @@ import           Data.List
 import           Data.Monoid
 
 import qualified Data.Array            as A
-import qualified Data.HashSet          as S
 import qualified Data.Graph            as G
 
+
 parta :: Text -> Int
-parta = length . G.stronglyConnComp . buildgraph . gridlist
+parta = length . filter (=='1') . concat . gridlist
+
+partb :: Text -> Int
+partb = length . G.stronglyConnComp . buildgraph . gridlist
 
 type Coord = (Int,Int)
 
@@ -36,7 +39,7 @@ neighs (x,y) = filter inrange [(x+dx,y+dy) | dx <- [-1..1], dy <- [-1..1], dx*dy
   where inrange = A.inRange ((0,0),(127,127))
 
 gridlist :: Text -> [[Char]]
-gridlist x = parMap rpar (tobinarystring . hash) [ x <> "-" <> t | t <- map (T.pack . show) [0..127]]
+gridlist x = map (tobinarystring . hash) [ x <> "-" <> t | t <- map (T.pack . show) [0..127]]
 
 tobinarystring :: ByteString -> [Char]
 tobinarystring =  concatMap tobin . map fromhex . C8.unpack
@@ -47,6 +50,7 @@ tobinarystring =  concatMap tobin . map fromhex . C8.unpack
 
 main :: IO ()
 main = do tprint $ parta "ffayrhll"
+          tprint $ partb "ffayrhll"
 
 tprint :: Show a => a -> IO ()
 tprint = TIO.putStrLn . T.pack . show
