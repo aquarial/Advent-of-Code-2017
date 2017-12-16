@@ -103,4 +103,4 @@ gradle-app.setting
 
 # Secrets
 .env
-Sponsors.hs
+haskell/src/Sponsors.hs
