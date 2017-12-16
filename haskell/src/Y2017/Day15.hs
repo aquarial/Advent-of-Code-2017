@@ -9,46 +9,38 @@ import           Text.Megaparsec
 import qualified Text.Megaparsec.Lexer as L
 import           Text.Megaparsec.Text  (Parser)
 
-import           Control.Monad
 import           Data.Bits
 import           Data.List
-import qualified Data.Map.Strict       as M
-import qualified Data.HashSet          as S
-import qualified Data.Graph            as G
 
-import Numeric
-import Data.Char
-tostr d = showIntAtBase 2 intToDigit d ""
 
-generator starts mults name = do s <- M.lookup name starts
-                                 m <- M.lookup name mults
-                                 return $ tail $ iterate (\x -> x*m `mod` 2147483647) s
+data Gen = Gen { _start  :: Integer
+               , _mult   :: Integer
+               , _filter :: Integer }
 
-test = do as <- generator starts mults 'A'
-          bs <- generator starts mults 'B'
-          pure $ (,) (judgeCount 5 [as,bs]) $ length $ filter (==0) $ take 5 $ zipWith bitcount as bs
+generator g = filter picky $ tail $ iterate (\x -> x*(_mult g) `mod` 2147483647) (_start g)
+  where picky x = x `mod` (_filter g) == 0
 
-parta starts = case sequence (map (generator starts mults) ['A','B']) of
-                 Nothing -> Nothing
-                 Just gs -> Just $ judgeCount (40*10^6) gs
+part1 (a,b) = length $ filter (==0) $ take (40*10^6) $ zipWith bitcount ga gb
+  where
+    ga = generator $ a { _filter = 1 }
+    gb = generator $ b { _filter = 1}
 
-mults  = M.fromList [('A',16807), ('B', 48271)]
-starts = M.fromList [('A',65)   , ('B', 8921) ]
-
-judgeCount :: Int -> [[Integer]] -> Int
-judgeCount num (a:b:_) = length $ filter (==0) $ take num $ zipWith bitcount a b
+part2 (a,b) = length $ filter (==0) $ take ( 5*10^6) $ zipWith bitcount ga gb
+  where
+    ga = generator a
+    gb = generator b
 
 bitcount :: Integer -> Integer -> Integer
 bitcount x y = (x `xor` y) .&. (2^16-1)
 
-p :: Parser (M.Map Char Integer)
-p = M.fromList <$> (line `sepEndBy` char '\n')
+p :: Parser (Gen, Gen)
+p = (,) <$> parsegen <* char '\n' <*> parsegen
 
-line = do string "Generator "
-          name <- oneOf ['A','B']
-          string " starts with "
-          start <- int
-          return (name,start)
+parsegen = do string "Generator "
+              name <- oneOf ['A','B']
+              string " starts with "
+              start <- int
+              pure $ if name == 'A' then Gen start 16807 4 else Gen start 48271 8
 
 int :: Parser Integer
 int = do change <- option id (negate <$ char '-')
@@ -60,10 +52,8 @@ main = do
   case parse p "input15" input of
     Left err -> TIO.putStr $ T.pack $ parseErrorPretty err
     Right bi -> do
-      tprint $ parta bi
+      tprint $ part1 bi
+      tprint $ part2 bi
 
 tprint :: Show a => a -> IO ()
 tprint = TIO.putStrLn . T.pack . show
-
--- 3999969
--- 39999694
