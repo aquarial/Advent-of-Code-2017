@@ -18,12 +18,12 @@ import qualified Data.Graph            as G
 parta xs = walk M.empty M.empty [] xs
 
 walk m rec prev []               = []
-walk m rec prev (i@(Snd a)  :xs)   = walk m (M.insert a (value m (Reg a)) rec) (i:prev) xs
+walk m rec prev (i@(Snd a)  :xs) = walk m (M.insert a (value m (Reg a)) rec) (i:prev) xs
 walk m rec prev (i@(Set a b):xs) = walk (M.insert a (value m b) m) rec (i:prev) xs
 walk m rec prev (i@(Add a b):xs) = walk (M.adjust (+(value m b)) a m) rec (i:prev) xs
 walk m rec prev (i@(Mod a b):xs) = walk (M.adjust (`mod`(value m b)) a m) rec (i:prev) xs
 walk m rec prev (i@(Mul a b):xs) = walk (M.adjust (*(value m b)) a m) rec (i:prev) xs
-walk m rec prev (i@(Rcv a)  :xs)   = if value m (Reg a) /= 0 then (i,M.lookup a rec, M.lookup a m, rec):[] else walk m rec (i:prev) xs
+walk m rec prev (i@(Rcv a)  :xs) = if value m (Reg a) /= 0 then (i,M.lookup a rec, M.lookup a m, rec):[] else walk m rec (i:prev) xs
 walk m rec prev (i@(Jgz a b):xs) = let aVal = value m a
                                        v = value m b
                                    in if aVal > 0
