@@ -43,19 +43,16 @@ drop1Recieve xs = takeWhile isSend xs ++ tail (dropWhile isSend xs)
 program :: Int -> V.Vector Instr -> [Network] -> [Network]
 program name instrs = walk (M.fromList [('p',name)]) 0
   where
-    walk vars i inputs = if i >= V.length instrs
-                         then []
-                         else
-                           case instrs V.! i of
-                             Snd a   -> Send (value vars a) : walk vars (i+1) (drop1Recieve inputs)
-                             Set a b -> walk (M.insert a (value vars b) vars)        (i+1) inputs
-                             Add a b -> walk (M.adjust (+    (value vars b)) a vars) (i+1) inputs
-                             Mod a b -> walk (M.adjust (`mod`(value vars b)) a vars) (i+1) inputs
-                             Mul a b -> walk (M.adjust (*    (value vars b)) a vars) (i+1) inputs
-                             Jgz a b -> if value vars a > 0 then walk vars (i + value vars b) inputs else walk vars (i+1) inputs
-                             Rcv a   -> Recieve : case inputs of
-                                                    (Send val):rest -> walk (M.insert a val vars) (i+1) rest
-                                                    _               -> []
+    walk vars i inputs = case instrs V.! i of
+                           Snd a   -> Send (value vars a) : walk vars (i+1) (drop1Recieve inputs)
+                           Set a b -> walk (M.insert a (value vars b) vars)        (i+1) inputs
+                           Add a b -> walk (M.adjust (+    (value vars b)) a vars) (i+1) inputs
+                           Mod a b -> walk (M.adjust (`mod`(value vars b)) a vars) (i+1) inputs
+                           Mul a b -> walk (M.adjust (*    (value vars b)) a vars) (i+1) inputs
+                           Jgz a b -> if value vars a > 0 then walk vars (i + value vars b) inputs else walk vars (i+1) inputs
+                           Rcv a   -> Recieve : case inputs of
+                                                  (Send val):rest -> walk (M.insert a val vars) (i+1) rest
+                                                  _               -> []
 
 value :: M.Map Char Int -> Val -> Int
 value m (Reg c) = M.findWithDefault 0 c m
