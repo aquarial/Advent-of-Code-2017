@@ -14,23 +14,22 @@ import           Data.List
 import qualified Data.Map.Strict       as M
 import qualified Data.HashSet          as S
 import qualified Data.Graph            as G
+import qualified Data.Vector           as V
 
-parta xs = walk M.empty M.empty [] xs
-
-walk m rec prev []               = []
-walk m rec prev (i@(Snd a)  :xs) = walk m (M.insert a (value m (Reg a)) rec) (i:prev) xs
-walk m rec prev (i@(Set a b):xs) = walk (M.insert a (value m b) m) rec (i:prev) xs
-walk m rec prev (i@(Add a b):xs) = walk (M.adjust (+(value m b)) a m) rec (i:prev) xs
-walk m rec prev (i@(Mod a b):xs) = walk (M.adjust (`mod`(value m b)) a m) rec (i:prev) xs
-walk m rec prev (i@(Mul a b):xs) = walk (M.adjust (*(value m b)) a m) rec (i:prev) xs
-walk m rec prev (i@(Rcv a)  :xs) = if value m (Reg a) /= 0 then (i,M.lookup a rec, M.lookup a m, rec):[] else walk m rec (i:prev) xs
-walk m rec prev (i@(Jgz a b):xs) = let aVal = value m a
-                                       v = value m b
-                                   in if aVal > 0
-                                      then walk m rec (i:prev) xs
-                                      else if v < 0
-                                           then walk m rec (drop (-v) prev) (reverse (take (-v) prev) ++ [i]++ xs)
-                                           else walk m rec (reverse (take (v-1) xs) ++ [i] ++ prev) (drop (v-1) xs)
+parta instrs = walk M.empty 0 0
+  where
+    walk vars recs i = case instrs V.! i of
+                         Snd a   -> walk vars (value vars (Reg a))  (i+1)
+                         Set a b -> walk (M.insert a (value vars b) vars)        recs (i+1)
+                         Add a b -> walk (M.adjust (+    (value vars b)) a vars) recs (i+1)
+                         Mod a b -> walk (M.adjust (`mod`(value vars b)) a vars) recs (i+1)
+                         Mul a b -> walk (M.adjust (*    (value vars b)) a vars) recs (i+1)
+                         Rcv a   -> if value vars (Reg a) /= 0 then recs else walk vars recs (i+1)
+                         Jgz a b -> let test = value vars a
+                                        jump = value vars b
+                                    in if test > 0
+                                       then walk vars recs (i+jump)
+                                       else walk vars recs (i+1)
 
 value :: M.Map Char Int -> Val -> Int
 value m (Reg c) = M.findWithDefault 0 c m
@@ -42,8 +41,8 @@ data Instr = Snd Char | Set Char Val | Add Char Val | Mul Char Val | Mod Char Va
   deriving Show
 
 
-p :: Parser [Instr]
-p = parseinstr `sepEndBy` char '\n'
+p :: Parser (V.Vector Instr)
+p = V.fromList <$> (parseinstr `sepEndBy` char '\n')
 
 parseinstr = Snd <$> (string "snd " *> letterChar) <|>
              Set <$> (string "set " *> letterChar) <*> (space *> pval) <|>
