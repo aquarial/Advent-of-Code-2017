@@ -12,25 +12,29 @@ import           Data.List
 import           Data.Maybe
 import qualified Data.Vector           as V
 
-
 data Dir = U | R | L | D deriving (Show, Eq)
+
 data Piece = V | H | S | Plus | Letter Char deriving (Show, Eq)
 
-letterToMaybe (Letter c) = Just c
-letterToMaybe _          = Nothing
+
+solve :: V.Vector (V.Vector Piece) -> (Int, [Char])
 solve xs = let path = walk xs (findstart xs) D
            in (length path, catMaybes (map letterToMaybe path))
 
---walk :: V.Vector (V.Vector Piece) -> S.HashSet (Int,Int) -> (Int,Int) -> [Piece]
+
+letterToMaybe (Letter c) = Just c
+letterToMaybe _          = Nothing
+
+
+walk :: V.Vector (V.Vector Piece) -> (Int, Int) -> Dir -> [Piece]
 walk vec start startDir = walkToPlus start startDir
   where
-    walkable S = False
-    walkable _ = True
-
     inRange (x,y) = (0<=x)&&(0<=y)&&(x<V.length (vec V.! 0))&&(y<V.length vec)
 
+    valid p = inRange p && get vec p == S
+
     changeDir :: (Int, Int) -> Dir -> [Piece]
-    changeDir p d = let newdir = head $ filter (\d -> inRange (move p d) && walkable (get vec (move p d))) $ filter (/= opposite d) [U,D,L,R]
+    changeDir p d = let newdir = head $ filter (valid . move p) $ filter (/= opposite d) [U,D,L,R]
                     in get vec p : walkToPlus (move p newdir) newdir
 
     walkToPlus :: (Int, Int) -> Dir -> [Piece]
@@ -39,6 +43,7 @@ walk vec start startDir = walkToPlus start startDir
                        Plus     -> changeDir p d
                        x -> x : walkToPlus (move p d) d
 
+get :: V.Vector (V.Vector a) -> (Int, Int) -> a
 get vec (x,y) = vec V.! y V.! x
 
 opposite U = D
@@ -51,12 +56,13 @@ move (x,y) R = (x+1,y)
 move (x,y) L = (x-1,y)
 move (x,y) D = (x,y+1)
 
+findstart :: V.Vector (V.Vector Piece) -> (Int, Int)
 findstart xs = case findIndex (\x -> get xs (x,0) == V ) [0..] of
                  Just x -> (x,0)
                  Nothing -> error "Nope"
 
 
-
+toarray :: [[a]] -> V.Vector (V.Vector a)
 toarray es = V.fromList $ map V.fromList es
 
 p :: Parser (V.Vector (V.Vector Piece))
