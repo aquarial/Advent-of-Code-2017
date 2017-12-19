@@ -22,7 +22,7 @@ data Piece = V | H | S | Plus | Letter Char deriving (Show, Eq)
 letterToMaybe (Letter c) = Just c
 letterToMaybe _          = Nothing
 
-parta xs = catMaybes $ map letterToMaybe $ walk xs (findstart xs) D
+parta xs = length $ walk xs (findstart xs) D
 
 --walk :: V.Vector (V.Vector Piece) -> S.HashSet (Int,Int) -> (Int,Int) -> [Piece]
 walk vec start startDir = walkToPlus start startDir
@@ -34,7 +34,7 @@ walk vec start startDir = walkToPlus start startDir
 
     changeDir :: (Int, Int) -> Dir -> [Piece]
     changeDir p d = let newdir = head $ filter (\d -> inRange (move p d) && walkable (get vec (move p d))) $ filter (/= opposite d) [U,D,L,R]
-                    in walkToPlus (move p newdir) newdir
+                    in get vec p : walkToPlus (move p newdir) newdir
 
     walkToPlus :: (Int, Int) -> Dir -> [Piece]
     walkToPlus p d = case get vec p of
