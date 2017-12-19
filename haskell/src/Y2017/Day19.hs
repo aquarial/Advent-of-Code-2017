@@ -31,7 +31,7 @@ walk vec start startDir = walkToPlus start startDir
   where
     inRange (x,y) = (0<=x)&&(0<=y)&&(x<V.length (vec V.! 0))&&(y<V.length vec)
 
-    valid p = inRange p && get vec p == S
+    valid p = inRange p && get vec p /= S
 
     changeDir :: (Int, Int) -> Dir -> [Piece]
     changeDir p d = let newdir = head $ filter (valid . move p) $ filter (/= opposite d) [U,D,L,R]
