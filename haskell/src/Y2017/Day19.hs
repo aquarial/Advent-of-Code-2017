@@ -6,23 +6,20 @@ import qualified Data.Text             as T
 import qualified Data.Text.IO          as TIO
 
 import           Text.Megaparsec
-import qualified Text.Megaparsec.Lexer as L
 import           Text.Megaparsec.Text  (Parser)
 
 import           Data.List
 import           Data.Maybe
-import qualified Data.Map.Strict       as M
-import qualified Data.HashSet          as S
-import qualified Data.Graph            as G
 import qualified Data.Vector           as V
+
 
 data Dir = U | R | L | D deriving (Show, Eq)
 data Piece = V | H | S | Plus | Letter Char deriving (Show, Eq)
 
 letterToMaybe (Letter c) = Just c
 letterToMaybe _          = Nothing
-
-parta xs = length $ walk xs (findstart xs) D
+solve xs = let path = walk xs (findstart xs) D
+           in (length path, catMaybes (map letterToMaybe path))
 
 --walk :: V.Vector (V.Vector Piece) -> S.HashSet (Int,Int) -> (Int,Int) -> [Piece]
 walk vec start startDir = walkToPlus start startDir
@@ -78,7 +75,7 @@ main = do
   case parse p "input19" input of
     Left err -> TIO.putStr $ T.pack $ parseErrorPretty err
     Right bi -> do
-      tprint $ parta bi
+      tprint $ solve bi
 
 tprint :: Show a => a -> IO ()
 tprint = TIO.putStrLn . T.pack . show
