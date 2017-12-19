@@ -13,7 +13,7 @@ import           Data.List
 import qualified Data.Map.Strict       as M
 import qualified Data.Vector           as V
 
-parta instrs = walk M.empty 0 0
+part1 instrs = walk M.empty 0 0
   where
     walk vars recs i = case instrs V.! i of
                          Snd a   -> walk vars (value vars a)  (i+1)
@@ -28,7 +28,7 @@ parta instrs = walk M.empty 0 0
                                        then walk vars recs (i+jump)
                                        else walk vars recs (i+1)
 
-partb instrs = let p0 = program 0 instrs p1
+part2 instrs = let p0 = program 0 instrs p1
                    p1 = program 1 instrs p0
                in length $ filter isSend p1
 
@@ -91,8 +91,8 @@ main = do
   case parse p "input18" input of
     Left err -> TIO.putStr $ T.pack $ parseErrorPretty err
     Right bi -> do
-      tprint $ parta bi
-      tprint $ partb bi
+      tprint $ part1 bi
+      tprint $ part2 bi
 
 tprint :: Show a => a -> IO ()
 tprint = TIO.putStrLn . T.pack . show
