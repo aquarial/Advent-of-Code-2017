@@ -75,7 +75,9 @@ main = do
   case parse p "input19" input of
     Left err -> TIO.putStr $ T.pack $ parseErrorPretty err
     Right bi -> do
-      tprint $ solve bi
+      let (one,two) = solve bi
+      tprint one
+      tprint two
 
 tprint :: Show a => a -> IO ()
 tprint = TIO.putStrLn . T.pack . show
