@@ -15,16 +15,29 @@ import qualified Data.Map.Strict       as M
 import qualified Data.HashSet          as S
 import qualified Data.Graph            as G
 
-parta xs = fst $ minimumBy (compare `on` manhatdist . _acl . snd) xs
-  where
-    manhatdist (x,y,z) = abs x + abs y + abs z
+parta = take 100 . numberOfCollisions
+
+numberOfCollisions xs = length xs : (numberOfCollisions $ removeCollisions $ map tick xs)
+
 
 data Particle = Particle { _pos :: (Int, Int, Int)
                          , _vel :: (Int, Int, Int)
                          , _acl :: (Int, Int, Int) } deriving (Show, Eq)
 
-p :: Parser [(Int, Particle)]
-p = zip [0..] <$> parseparticle `sepEndBy` char '\n'
+removeCollisions :: [Particle] -> [Particle]
+removeCollisions parts = filter (\p -> M.findWithDefault 1 (_pos p) (allpos parts) == 1) parts
+
+allpos parts= foldl' (\m p -> M.insertWith (+) p 1 m) M.empty (map _pos parts)
+
+tick :: Particle -> Particle
+tick (Particle p v a) = Particle (tick3 p v2) v2 a
+  where v2 = tick3 v a
+        tick3 (x,y,z) (dx,dy,dz) = (x+dx,y+dy,z+dz)
+
+manhatdist (x,y,z) = abs x + abs y + abs z
+
+p :: Parser [Particle]
+p = parseparticle `sepEndBy` char '\n'
 
 parseparticle :: Parser Particle
 parseparticle = do string "p="
