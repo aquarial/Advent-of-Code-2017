@@ -40,13 +40,9 @@ p :: Parser [Particle]
 p = parseparticle `sepEndBy` char '\n'
 
 parseparticle :: Parser Particle
-parseparticle = do string "p="
-                   p <- threenum
-                   string ", v="
-                   v <- threenum
-                   string ", a="
-                   a <- threenum
-                   return $ Particle p v a
+parseparticle = Particle <$> (string   "p=" *> threenum) <*>
+                             (string ", v=" *> threenum) <*>
+                             (string ", a=" *> threenum)
   where
     threenum = (,,) <$> (char '<' *> int) <*> (char ',' *> int) <*> (char ',' *> int) <* char '>'
 
