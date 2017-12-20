@@ -12,10 +12,10 @@ import           Text.Megaparsec.Text  (Parser)
 import           Data.List
 import           Data.Function (on)
 import qualified Data.Map.Strict       as M
-import qualified Data.HashSet          as S
-import qualified Data.Graph            as G
 
-parta = take 100 . numberOfCollisions
+part1 = fst . minimumBy (compare `on` manhatdist . _acl . snd) . zip [0..]
+
+part2 = last . take 50 . numberOfCollisions
 
 numberOfCollisions xs = length xs : (numberOfCollisions $ removeCollisions $ map tick xs)
 
@@ -61,7 +61,8 @@ main = do
   case parse p "input20" input of
     Left err -> TIO.putStr $ T.pack $ parseErrorPretty err
     Right bi -> do
-      tprint $ parta bi
+      tprint $ part1 bi
+      tprint $ part2 bi
 
 tprint :: Show a => a -> IO ()
 tprint = TIO.putStrLn . T.pack . show
