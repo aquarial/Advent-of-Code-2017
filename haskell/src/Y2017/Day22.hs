@@ -1,4 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE Strict #-}
+{-# LANGUAGE StrictData #-}
+{-# LANGUAGE BangPatterns #-}
 module Y2017.Day22 where
 
 import           Data.Text             (Text)
@@ -24,7 +27,10 @@ data Pos = Pos (Int,Int) Dir deriving (Show, Eq)
 
 -- 5411
 -- 5567
-parta = sum . take (10^7) . walk . setup
+parta x = foldl1' (+) . take (10^7) . walk $ ss
+  where
+    s = setup x
+    ss = seq s s
 
 setup xs = (pos, board)
   where
@@ -37,7 +43,7 @@ setup xs = (pos, board)
 data Turn = TurnL | TurnR | Opposite | None
 
 
-walk (Pos p d, b) = case M.findWithDefault Clean p b of
+walk (Pos !p !d, !b) = case M.findWithDefault Clean p b of
                           Clean ->    0:walk (newpos TurnL   , M.insert p Weakened b)
                           Weakened -> 1:walk (newpos None    , M.insert p Infect   b)
                           Infect ->   0:walk (newpos TurnR   , M.insert p Flagged  b)
