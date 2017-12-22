@@ -44,10 +44,10 @@ walk (Pos p d, b) = case M.findWithDefault Clean p b of
     turnleft D = R
     turnleft R = U
     turnright = turnleft . turnleft . turnleft
-    move (x,y) U = (x,y+1)
-    move (x,y) D = (x,y-1)
-    move (x,y) L = (x-1,y)
-    move (x,y) R = (x+1,y)
+move (x,y) U = (x,y-1)
+move (x,y) D = (x,y+1)
+move (x,y) L = (x-1,y)
+move (x,y) R = (x+1,y)
 
 
 p :: Parser [[Node]]
