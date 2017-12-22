@@ -14,14 +14,17 @@ import qualified Data.Map.Strict       as M
 import qualified Data.HashSet          as S
 import qualified Data.Graph            as G
 
-data Node = Clean | Infect deriving (Show, Eq)
+data Node = Clean | Weakened | Infect | Flagged deriving (Show, Eq)
 
 data Action = Cleaning | Infecting deriving (Show, Eq)
 
 data Dir = U | L | R | D deriving (Show, Eq)
 data Pos = Pos (Int,Int) Dir deriving (Show, Eq)
 
-parta = length . filter (==Infecting) . take (10^4) . walk . setup
+
+-- 5411
+-- 5567
+parta = sum . take (10^7) . walk . setup
 
 setup xs = (pos, board)
   where
@@ -31,19 +34,25 @@ setup xs = (pos, board)
     indexed = [(ix,iy,x) | (iy, y) <- zip [0..] xs, (ix, x) <- zip [0..] y]
     board = foldl' (\m (x,y,n) -> M.insert (x,y) n m) M.empty indexed
 
-data Turn = TurnL | TurnR
+data Turn = TurnL | TurnR | Opposite | None
 
 walk (Pos p d, b) = case M.findWithDefault Clean p b of
-                          Clean  -> Infecting : walk (newpos TurnL, M.adjust (const Infect) p b)
-                          Infect -> Cleaning  : walk (newpos TurnR, M.adjust (const Clean ) p b)
+                          Clean ->    0:walk (newpos TurnL   , M.insert p Weakened b)
+                          Weakened -> 1:walk (newpos None    , M.insert p Infect   b)
+                          Infect ->   0:walk (newpos TurnR   , M.insert p Flagged  b)
+                          Flagged ->  0:walk (newpos Opposite, M.insert p Clean    b)
   where
-    newpos TurnL = Pos (move p (turnleft  d)) (turnleft  d)
-    newpos TurnR = Pos (move p (turnright d)) (turnright d)
-    turnleft U = L
-    turnleft L = D
-    turnleft D = R
-    turnleft R = U
-    turnright = turnleft . turnleft . turnleft
+    newpos TurnL =    Pos (move p (turnleft  d)) (turnleft  d)
+    newpos TurnR =    Pos (move p (turnright d)) (turnright d)
+    newpos None  =    Pos (move p d) d
+    newpos Opposite = Pos (move p (opposite d)) (opposite d)
+
+turnleft U = L
+turnleft L = D
+turnleft D = R
+turnleft R = U
+turnright = turnleft . turnleft . turnleft
+opposite = turnleft . turnleft
 move (x,y) U = (x,y-1)
 move (x,y) D = (x,y+1)
 move (x,y) L = (x-1,y)
@@ -54,7 +63,7 @@ p :: Parser [[Node]]
 p = line `sepEndBy` char '\n'
 
 
-line = do many $ (Clean <$ char '.') <|> (Infect <$ char '#')
+line = some $ (Clean <$ char '.') <|> (Infect <$ char '#')
 
 main :: IO ()
 main = do
