@@ -10,25 +10,20 @@ import qualified Text.Megaparsec.Lexer as L
 import           Text.Megaparsec.Text  (Parser)
 
 import           Data.List
-import qualified Data.Map.Strict       as M
-import qualified Data.HashSet          as S
-import qualified Data.Graph            as G
-import qualified Data.Vector           as V
 
 start :: [[Light]]
 start = case parse ppat "start" ".#./..#/###" of
           Left e -> error "formatting"
           Right x -> x
 
--- 131 295
-parta xs = let lights = length . filter (==On) . concat
-           in map lights $ take (18+1) $ iterate (iteration xs) start
---parta xs = map length $  take (5+1) $ iterate (iteration xs) start
+part1 xs = let lights = length . filter (==On) . concat
+           in lights $ last $  take (5+1) $ iterate (iteration xs) start
+
+part2 xs = let lights = length . filter (==On) . concat
+           in lights $ last $  take (18+1) $ iterate (iteration xs) start
 
 iteration rules = joinParts . map (applyRule rules) . breakup
---joinParts $ map (applyRule xs) $ breakup start
 
---applyRule :: [Rule] -> [[Light]] -> [[Light]]
 applyRule rules xs = case find (\r -> any (\c -> c == fst r) (allChanges xs)) rules of
                        Nothing -> error $ "Couldn't match " ++ show (allChanges xs)
                        Just r ->  snd r
@@ -100,7 +95,8 @@ main = do
   case parse p "input21" input of
     Left err -> TIO.putStr $ T.pack $ parseErrorPretty err
     Right bi -> do
-      tprint $ parta bi
+      tprint $ part1 bi
+      tprint $ part2 bi
 
 tprint :: Show a => a -> IO ()
 tprint = TIO.putStrLn . T.pack . show
