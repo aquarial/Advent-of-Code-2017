@@ -21,8 +21,8 @@ start = case parse ppat "start" ".#./..#/###" of
           Right x -> x
 
 -- 131 295
-parta xs = let x = last $ take (5+1) $ iterate (iteration xs) start
-           in  length $ filter (== On) $ concat x
+parta xs = let lights = length . filter (==On) . concat
+           in map lights $ take (18+1) $ iterate (iteration xs) start
 --parta xs = map length $  take (5+1) $ iterate (iteration xs) start
 
 iteration rules = joinParts . map (applyRule rules) . breakup
