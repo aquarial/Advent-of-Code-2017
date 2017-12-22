@@ -36,6 +36,7 @@ setup xs = (pos, board)
 
 data Turn = TurnL | TurnR | Opposite | None
 
+
 walk (Pos p d, b) = case M.findWithDefault Clean p b of
                           Clean ->    0:walk (newpos TurnL   , M.insert p Weakened b)
                           Weakened -> 1:walk (newpos None    , M.insert p Infect   b)
@@ -44,8 +45,8 @@ walk (Pos p d, b) = case M.findWithDefault Clean p b of
   where
     newpos TurnL =    Pos (move p (turnleft  d)) (turnleft  d)
     newpos TurnR =    Pos (move p (turnright d)) (turnright d)
-    newpos None  =    Pos (move p d) d
-    newpos Opposite = Pos (move p (opposite d)) (opposite d)
+    newpos None  =    Pos (move p            d)             d
+    newpos Opposite = Pos (move p (opposite  d))  (opposite d)
 
 turnleft U = L
 turnleft L = D
