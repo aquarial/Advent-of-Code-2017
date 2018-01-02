@@ -10,6 +10,7 @@ import qualified Text.Megaparsec.Lexer as L
 import           Text.Megaparsec.Text  (Parser)
 
 import           Data.List
+import           Data.Numbers.Primes
 import qualified Data.Map.Strict       as M
 import qualified Data.HashSet          as S
 import qualified Data.Graph            as G
@@ -17,12 +18,17 @@ import qualified Data.Vector           as V
 
 --  parta = map head . group . map (M.lookup 'h') . runprogram 0 (M.insert 'a' 1 M.empty)
 --  parta = length . filter isMul . runprogram 0 M.empty
-
+-- 1455, 86
 
 parta = unlines . take 1000 . map show . runprogram 0 (M.insert 'a' 1 M.empty)
+
+partb = let numPrimes = length $ takeWhile (<e) $ filter (\n -> (n-b)`mod`17==0) $ dropWhile (<b) primes
+            numNums   = (e - b) `div` 17 + 1
+        in numNums - numPrimes
   where
-    isMul (Mul _ _) = True
-    isMul _         = False
+    b=105700
+    e=122700
+
 
 runprogram i vs instrs = if i < 0 || i >= V.length instrs
                          then []
@@ -66,7 +72,8 @@ main = do
   case parse p "input23" input of
     Left err -> TIO.putStr $ T.pack $ parseErrorPretty err
     Right bi -> do
-      putStrLn $ parta bi
+      --putStr $ parta bi
+      tprint $ partb
 
 tprint :: Show a => a -> IO ()
 tprint = TIO.putStrLn . T.pack . show
