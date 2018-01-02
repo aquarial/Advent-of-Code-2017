@@ -12,27 +12,26 @@ import           Text.Megaparsec.Text  (Parser)
 import           Data.List
 import           Data.Numbers.Primes
 import qualified Data.Map.Strict       as M
-import qualified Data.HashSet          as S
-import qualified Data.Graph            as G
 import qualified Data.Vector           as V
 
---  parta = map head . group . map (M.lookup 'h') . runprogram 0 (M.insert 'a' 1 M.empty)
---  parta = length . filter isMul . runprogram 0 M.empty
--- 1455, 86
+parta = length . filter isMul . map instructions . runprogram 0 M.empty
+  where
+    isMul (Mul _ _) = True
+    isMul _         = False
 
-parta = unlines . take 1000 . map show . runprogram 0 (M.insert 'a' 1 M.empty)
-
-partb = let numPrimes = length $ takeWhile (<e) $ filter (\n -> (n-b)`mod`17==0) $ dropWhile (<b) primes
-            numNums   = (e - b) `div` 17 + 1
+partb xs = let numPrimes = length $ takeWhile (<c) $ filter (\n -> (n-b)`mod`17==0) $ dropWhile (<b) primes
+               numNums   = (c - b) `div` 17 + 1
         in numNums - numPrimes
   where
-    b=105700
-    e=122700
+    vars = variables $ last $ take 8 $ runprogram 0 (M.insert 'a' 1 M.empty) xs
+    b = M.findWithDefault 0 'b' vars
+    c = M.findWithDefault 0 'c' vars
 
-
+instructions = fst
+variables    = snd
 runprogram i vs instrs = if i < 0 || i >= V.length instrs
                          then []
-                         else vs : runprogram (nextindex instr) (vars instr) instrs
+                         else (instrs V.! i, vs) : runprogram (nextindex instr) (vars instr) instrs
   where
     nextindex (Jnz v0 v1) | val v0 /= 0 = i + val v1
     nextindex _                         = i+1
@@ -72,8 +71,8 @@ main = do
   case parse p "input23" input of
     Left err -> TIO.putStr $ T.pack $ parseErrorPretty err
     Right bi -> do
-      --putStr $ parta bi
-      tprint $ partb
+      tprint $ parta bi
+      tprint $ partb bi
 
 tprint :: Show a => a -> IO ()
 tprint = TIO.putStrLn . T.pack . show
