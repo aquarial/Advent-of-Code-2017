@@ -14,12 +14,14 @@ import           Data.Numbers.Primes
 import qualified Data.Map.Strict       as M
 import qualified Data.Vector           as V
 
-parta = length . filter isMul . map instructions . runprogram 0 M.empty
+part1 :: V.Vector Instr -> Int
+part1 = length . filter isMul . map instructions . runprogram 0 M.empty
   where
     isMul (Mul _ _) = True
     isMul _         = False
 
-partb xs = let numPrimes = length $ takeWhile (<c) $ filter (\n -> (n-b)`mod`17==0) $ dropWhile (<b) primes
+part2 :: V.Vector Instr -> Int
+part2 xs = let numPrimes = length $ takeWhile (<c) $ filter (\n -> (n-b)`mod`17==0) $ dropWhile (<b) primes
                numNums   = (c - b) `div` 17 + 1
         in numNums - numPrimes
   where
@@ -71,8 +73,8 @@ main = do
   case parse p "input23" input of
     Left err -> TIO.putStr $ T.pack $ parseErrorPretty err
     Right bi -> do
-      tprint $ parta bi
-      tprint $ partb bi
+      tprint $ part1 bi
+      tprint $ part2 bi
 
 tprint :: Show a => a -> IO ()
 tprint = TIO.putStrLn . T.pack . show
