@@ -15,14 +15,18 @@ import qualified Data.HashSet          as S
 import qualified Data.Graph            as G
 import qualified Data.Vector           as V
 
-parta = length . filter isMul . runprogram 0 M.empty
+--  parta = map head . group . map (M.lookup 'h') . runprogram 0 (M.insert 'a' 1 M.empty)
+--  parta = length . filter isMul . runprogram 0 M.empty
+
+
+parta = unlines . take 1000 . map show . runprogram 0 (M.insert 'a' 1 M.empty)
   where
     isMul (Mul _ _) = True
     isMul _         = False
 
 runprogram i vs instrs = if i < 0 || i >= V.length instrs
                          then []
-                         else instr : runprogram (nextindex instr) (vars instr) instrs
+                         else vs : runprogram (nextindex instr) (vars instr) instrs
   where
     nextindex (Jnz v0 v1) | val v0 /= 0 = i + val v1
     nextindex _                         = i+1
@@ -62,7 +66,7 @@ main = do
   case parse p "input23" input of
     Left err -> TIO.putStr $ T.pack $ parseErrorPretty err
     Right bi -> do
-      print $ parta bi
+      putStrLn $ parta bi
 
 tprint :: Show a => a -> IO ()
 tprint = TIO.putStrLn . T.pack . show
