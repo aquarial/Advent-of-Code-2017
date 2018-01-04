@@ -15,7 +15,10 @@ import qualified Data.HashSet          as S
 import qualified Data.Graph            as G
 import qualified Data.Vector           as V
 
-parta = maximum . map strength . allPaths 0
+parta cs = maximum $ map strength $ filter (\l -> length l == mlen) paths
+  where
+    paths = allPaths 0 cs
+    mlen = maximum (map length paths)
 
 strength = sum . map compSum
   where
@@ -23,7 +26,9 @@ strength = sum . map compSum
 
 allPaths :: Int -> [Comp] -> [[Comp]]
 allPaths c [] = []
-allPaths c cs = [] : concatMap (\x -> map (x:) (allPaths (other c x) (delete x cs)))  (filter (fits c) cs)
+allPaths c cs = case filter (fits c) cs of
+                  [] -> [[]]
+                  ccs -> concatMap (\x -> map (x:) (allPaths (other c x) (delete x cs))) ccs
 
 other c (Comp a b) = if c == a then b else a
 
