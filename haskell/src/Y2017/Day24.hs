@@ -10,16 +10,16 @@ import qualified Text.Megaparsec.Lexer as L
 import           Text.Megaparsec.Text  (Parser)
 
 import           Data.List
-import qualified Data.Map.Strict       as M
-import qualified Data.HashSet          as S
-import qualified Data.Graph            as G
-import qualified Data.Vector           as V
 
-parta cs = maximum $ map strength $ filter (\l -> length l == mlen) paths
+
+part1 = maximum . map strength . allPaths 0
+
+part2 cs = maximum $ map strength $ filter (\l -> length l == mlen) paths
   where
     paths = allPaths 0 cs
     mlen = maximum (map length paths)
 
+strength :: [Comp] -> Int
 strength = sum . map compSum
   where
     compSum (Comp a b) = a + b
@@ -30,8 +30,10 @@ allPaths c cs = case filter (fits c) cs of
                   [] -> [[]]
                   ccs -> concatMap (\x -> map (x:) (allPaths (other c x) (delete x cs))) ccs
 
+other :: Int -> Comp -> Int
 other c (Comp a b) = if c == a then b else a
 
+fits :: Int -> Comp -> Bool
 fits c (Comp a b) = c == a || c == b
 
 data Comp = Comp Int Int deriving (Show, Eq)
@@ -51,7 +53,8 @@ main = do
   case parse p "input24" input of
     Left err -> TIO.putStr $ T.pack $ parseErrorPretty err
     Right bi -> do
-      tprint $ parta bi
+      tprint $ part1 bi
+      tprint $ part2 bi
 
 tprint :: Show a => a -> IO ()
 tprint = TIO.putStrLn . T.pack . show
