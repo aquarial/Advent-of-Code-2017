@@ -11,7 +11,6 @@ import           Text.Megaparsec.Text  (Parser)
 
 import           Data.List
 
-
 part1 = maximum . map strength . allPaths 0
 
 part2 cs = maximum $ map strength $ filter (\l -> length l == mlen) paths
@@ -19,29 +18,27 @@ part2 cs = maximum $ map strength $ filter (\l -> length l == mlen) paths
     paths = allPaths 0 cs
     mlen = maximum (map length paths)
 
-strength :: [Comp] -> Int
+strength :: [(Int,Int)] -> Int
 strength = sum . map compSum
   where
-    compSum (Comp a b) = a + b
+    compSum (a, b) = a + b
 
-allPaths :: Int -> [Comp] -> [[Comp]]
+allPaths :: Int -> [(Int,Int)] -> [[(Int,Int)]]
 allPaths c [] = []
 allPaths c cs = case filter (fits c) cs of
                   [] -> [[]]
                   ccs -> concatMap (\x -> map (x:) (allPaths (other c x) (delete x cs))) ccs
 
-other :: Int -> Comp -> Int
-other c (Comp a b) = if c == a then b else a
+other :: Int -> (Int,Int) -> Int
+other c (a, b) = if c == a then b else a
 
-fits :: Int -> Comp -> Bool
-fits c (Comp a b) = c == a || c == b
+fits :: Int -> (Int,Int) -> Bool
+fits c (a, b) = c == a || c == b
 
-data Comp = Comp Int Int deriving (Show, Eq)
-
-p :: Parser [Comp]
+p :: Parser [(Int,Int)]
 p = parsecomp `sepEndBy` char '\n' <* eof
 
-parsecomp = Comp <$> int <* char '/' <*> int
+parsecomp = (,) <$> int <* char '/' <*> int
 
 int :: Parser Int
 int = do change <- option id (negate <$ char '-')
