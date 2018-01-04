@@ -13,6 +13,7 @@ import           Data.List
 import qualified Data.Map.Strict       as M
 import qualified Data.HashSet          as S
 import qualified Data.Graph            as G
+import qualified Data.Vector           as V
 
 parta xs = xs
 
