@@ -5,29 +5,21 @@ import qualified Data.Text    as T
 
 import           Data.Char
 
+part1 :: [Int] -> Int
+part1 nums = sum $ zipWith diffval nums (tail nums)
 
+part2 :: [Int] -> Int
+part2 nums = sum $ zipWith diffval nums (drop (length nums `div` 2) (cycle nums))
+
+diffval a b | a == b = a
+            | a /= b = 0
 
 main :: IO ()
 main = do
   input <- TIO.readFile "src/Y2017/input01"
-  let processed = map digitToInt $ filter isNumber $ T.unpack input
-      p1 = part1 processed
-      p2 = part2 processed
-  TIO.putStrLn $ T.pack $ show p1
-  TIO.putStrLn $ T.pack $ show p2
-  return ()
+  let procs = map digitToInt $ filter isNumber $ T.unpack input
+  tprint $ part1 procs
+  tprint $ part2 procs
 
-part1 :: [Int] -> Int
-part1 nums = walk (head nums) nums
-  where
-    walk :: Int -> [Int] -> Int
-    walk f []     = error "Empty list"
-    walk f (a:[]) = if a == f then f else 0
-    walk f (a:as) = if a == head as then a + walk f as
-                                    else     walk f as
-
-
-part2 :: [Int] -> Int
-part2 nums = sum $ zipWith (\a b -> if a == b then a else 0) nums (drop l nums ++ take l nums)
-  where
-    l = length nums `div` 2
+tprint :: Show a => a -> IO ()
+tprint = TIO.putStrLn . T.pack . show
