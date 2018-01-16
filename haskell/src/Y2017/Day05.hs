@@ -1,13 +1,14 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE BangPatterns #-}
 module Y2017.Day05 where
 
 import qualified Data.Text             as T
 import qualified Data.Text.IO          as TIO
 
-import           Data.Vector           (Vector)
-import           Data.Vector.Mutable   (MVector, STVector)
-import qualified Data.Vector           as V
-import qualified Data.Vector.Mutable   as MV
+import           Data.Vector.Unboxed           (Vector)
+import           Data.Vector.Unboxed.Mutable   (MVector, STVector)
+import qualified Data.Vector.Unboxed           as V
+import qualified Data.Vector.Unboxed.Mutable   as MV
 
 import           Text.Megaparsec.Text  (Parser)
 import           Text.Megaparsec
@@ -26,7 +27,7 @@ main = do
     Left  err   -> TIO.putStr $ T.pack $ parseErrorPretty err
     Right jumps -> do
       tprint $ part1_mut jumps
-      tprint $ part2 jumps
+      tprint $ part2_mut jumps
   return ()
 
 p :: Parser (Vector Int)
@@ -60,3 +61,14 @@ walk changer list = walkacc 0 [] list
     walkacc acc _  []     = acc
     walkacc acc as (b:bs) | b <= 0 = walkacc (acc+1) ( drop (-b) as )  ( reverse (take (-b) as) ++ [changer b] ++ bs )
     walkacc acc as (b:bs) | b >  0 = walkacc (acc+1) ( reverse (take b ((changer b):bs)) ++ as )  (drop b (b:bs))
+
+part2_mut vec = ST.runST $ do v0 <- V.thaw vec
+                              walk v0 0 0
+  where
+    chang x = if x < 3 then x+1 else x-1
+
+    walk v !steps !i = if i < 0 || i >= MV.length v
+                       then pure steps
+                       else do x0 <- MV.read v i
+                               MV.write v i (chang x0)
+                               walk v (steps+1) (i+x0)
