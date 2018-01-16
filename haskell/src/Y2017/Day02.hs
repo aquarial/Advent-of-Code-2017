@@ -12,31 +12,30 @@ import           Text.Megaparsec
 import           Text.Megaparsec.Text (Parser)
 import qualified Text.Megaparsec.Lexer as L
 
-
-spreadsheet :: Parser [[Integer]]
-spreadsheet = row `sepBy` char '\n'
-
-row :: Parser [Integer]
-row = L.integer `sepBy` tab
-
-main :: IO ()
-main = do
-  input <- TIO.readFile "src/y2017/input02"
-  let sheet = filter (not . null) $ maybe [] id $ parseMaybe spreadsheet input
-      p1 = part1 sheet
-      p2 = part2 sheet
-  TIO.putStrLn $ T.pack $ show p1
-  TIO.putStrLn $ T.pack $ show p2
-  return ()
-
-
 part1 :: [[Integer]] -> Integer
 part1 nums = sum $ zipWith (-) (map maximum nums) (map minimum nums)
-
 
 part2 :: [[Integer]] -> Integer
 part2 nums = sum $ map (evenlyDivide . sort) nums
   where
-    evenlyDivide (x:xs) = case filter (\a -> a `mod` x == 0) xs of
+    evenlyDivide (x:xs) = case filter ((==0) . (`mod` x)) xs of
+                            (big:_) -> big `div` x
                             []      -> evenlyDivide xs
-                            (ans:_) -> ans `div` x
+
+spreadsheet :: Parser [[Integer]]
+spreadsheet = row `sepEndBy` char '\n' <* eof
+
+row :: Parser [Integer]
+row = L.integer `sepBy1` tab
+
+main :: IO ()
+main = do
+  input <- TIO.readFile "src/Y2017/input02"
+  case parse spreadsheet "Day02" input of
+    Left err -> tprint $ parseErrorPretty err
+    Right bi -> do
+      tprint $ part1 bi
+      tprint $ part2 bi
+
+tprint :: Show a => a -> IO ()
+tprint = TIO.putStrLn . T.pack . show
