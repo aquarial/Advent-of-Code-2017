@@ -9,7 +9,7 @@ import           Data.Char
 
 main :: IO ()
 main = do
-  input <- TIO.readFile "src/y2017/input01"
+  input <- TIO.readFile "src/Y2017/input01"
   let processed = map digitToInt $ filter isNumber $ T.unpack input
       p1 = part1 processed
       p2 = part2 processed
