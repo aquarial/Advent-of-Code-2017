@@ -1,5 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE BangPatterns #-}
+
 module Y2017.Day05 where
 
 import qualified Data.Text             as T
@@ -67,8 +68,9 @@ part2_mut vec = ST.runST $ do v0 <- V.thaw vec
   where
     chang x = if x < 3 then x+1 else x-1
 
+    walk :: MVector s Int -> Int -> Int -> ST.ST s Int
     walk v !steps !i = if i < 0 || i >= MV.length v
                        then pure steps
                        else do x0 <- MV.read v i
-                               MV.write v i (chang x0)
+                               MV.write v i $! chang x0
                                walk v (steps+1) (i+x0)
