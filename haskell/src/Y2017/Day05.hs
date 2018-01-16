@@ -51,17 +51,17 @@ part1_mut vec = ST.runST $ do v <- V.thaw vec
                             mwalk v (i+x) (acc+1)
 
 
-part2 :: Vector Int -> Integer
-part2 = walk change . V.toList
-  where
-    change x = if x < 3 then x+1 else x-1
-
-walk :: Num a => (Int -> Int) -> [Int] -> a
-walk changer list = walkacc 0 [] list
-  where
-    walkacc acc _  []     = acc
-    walkacc acc as (b:bs) | b <= 0 = walkacc (acc+1) ( drop (-b) as )  ( reverse (take (-b) as) ++ [changer b] ++ bs )
-    walkacc acc as (b:bs) | b >  0 = walkacc (acc+1) ( reverse (take b ((changer b):bs)) ++ as )  (drop b (b:bs))
+--part2 :: Vector Int -> Integer
+--part2 = walk change . V.toList
+--  where
+--    change x = if x < 3 then x+1 else x-1
+--
+--walk :: Num a => (Int -> Int) -> [Int] -> a
+--walk changer list = walkacc 0 [] list
+--  where
+--    walkacc acc _  []     = acc
+--    walkacc acc as (b:bs) | b <= 0 = walkacc (acc+1) ( drop (-b) as )  ( reverse (take (-b) as) ++ [changer b] ++ bs )
+--    walkacc acc as (b:bs) | b >  0 = walkacc (acc+1) ( reverse (take b ((changer b):bs)) ++ as )  (drop b (b:bs))
 
 part2_mut vec = ST.runST $ do v0 <- V.thaw vec
                               walk v0 0 0
