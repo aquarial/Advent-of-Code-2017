@@ -5,11 +5,14 @@ import           Data.Text             (Text)
 import qualified Data.Text             as T
 import qualified Data.Text.IO          as TIO
 
+import           Data.Void
 import           Text.Megaparsec
-import qualified Text.Megaparsec.Lexer as L
-import           Text.Megaparsec.Text  (Parser)
+import           Text.Megaparsec.Char
+import qualified Text.Megaparsec.Char.Lexer as L
 
 data Move = S | SW | NW | N | NE | SE
+
+type Parser = Parsec Void Text
 
 p :: Parser [Move]
 p = (move <$> word) `sepBy` char ','

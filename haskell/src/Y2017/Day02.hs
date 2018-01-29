@@ -4,13 +4,15 @@ import qualified Data.Text.IO as TIO
 import qualified Data.Text    as T
 import           Data.Text    (Text)
 
+import           Data.Void
 import           Data.Char
 import           Data.List
 import           Data.Maybe (catMaybes)
 
 import           Text.Megaparsec
-import           Text.Megaparsec.Text (Parser)
-import qualified Text.Megaparsec.Lexer as L
+import           Text.Megaparsec.Char
+import qualified Text.Megaparsec.Char.Lexer as L
+
 
 part1 :: [[Integer]] -> Integer
 part1 nums = sum $ zipWith (-) (map maximum nums) (map minimum nums)
@@ -22,11 +24,14 @@ part2 nums = sum $ map (evenlyDivide . sort) nums
                             (big:_) -> big `div` x
                             []      -> evenlyDivide xs
 
+
+type Parser = Parsec Void Text
+
 spreadsheet :: Parser [[Integer]]
 spreadsheet = row `sepEndBy` char '\n' <* eof
 
 row :: Parser [Integer]
-row = L.integer `sepBy1` tab
+row = L.decimal `sepBy1` tab
 
 main :: IO ()
 main = do

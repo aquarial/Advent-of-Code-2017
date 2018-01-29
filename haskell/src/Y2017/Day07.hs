@@ -5,9 +5,10 @@ import           Data.Text             (Text)
 import qualified Data.Text             as T
 import qualified Data.Text.IO          as TIO
 
+import           Data.Void
 import           Text.Megaparsec
-import qualified Text.Megaparsec.Lexer as L
-import           Text.Megaparsec.Text  (Parser)
+import           Text.Megaparsec.Char
+import qualified Text.Megaparsec.Char.Lexer as L
 
 import           Data.List
 import qualified Data.Map.Strict       as M
@@ -25,6 +26,8 @@ main = do
       tprint $ part2 betterInput
   return ()
 
+type Parser = Parsec Void Text
+
 p :: Parser [(Text, Int, [Text])]
 p = program `sepBy` char '\n'
 
@@ -40,7 +43,7 @@ program = do
 int :: Parser Int
 int = do
       change <- option id (negate <$ char '-')
-      fromInteger . change <$> L.integer
+      fromInteger . change <$> L.decimal
 
 supports :: Parser [Text]
 supports = string " -> "   *>  (T.pack <$> some letterChar) `sepBy` string ", "

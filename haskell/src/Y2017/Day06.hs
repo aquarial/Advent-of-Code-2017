@@ -1,12 +1,15 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Y2017.Day06 where
 
+import           Data.Text             (Text)
 import qualified Data.Text             as T
 import qualified Data.Text.IO          as TIO
 
+import           Data.Void
 import           Text.Megaparsec
-import qualified Text.Megaparsec.Lexer as L
-import           Text.Megaparsec.Text  (Parser)
+import           Text.Megaparsec.Char
+import qualified Text.Megaparsec.Char.Lexer as L
+
 
 import qualified Data.Map              as M
 import qualified Data.Set              as S
@@ -25,10 +28,12 @@ main = do
       tprint b
   return ()
 
+type Parser = Parsec Void Text
+
 p :: Parser [Int]
 p = int `sepBy` char '\t'
   where
-    int = fromInteger <$> L.integer
+    int = fromInteger <$> L.decimal
 
 
 solve :: Num t => [Int] -> (t, t)

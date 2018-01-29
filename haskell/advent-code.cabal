@@ -29,7 +29,7 @@ executable advent-code
                        digits,
                        hashable,
                        lens,
-                       megaparsec,
+                       megaparsec == 6.3.0,
                        split,
                        primes,
                        text,

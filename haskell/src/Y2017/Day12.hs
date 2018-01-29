@@ -5,11 +5,14 @@ import           Data.Text             (Text)
 import qualified Data.Text             as T
 import qualified Data.Text.IO          as TIO
 
+import           Data.Void
 import           Text.Megaparsec
-import qualified Text.Megaparsec.Lexer as L
-import           Text.Megaparsec.Text  (Parser)
+import           Text.Megaparsec.Char
+import qualified Text.Megaparsec.Char.Lexer as L
 
 import qualified Data.Graph            as G
+
+type Parser = Parsec Void Text
 
 p :: Parser (G.Graph)
 p = buildgraph <$> line `sepEndBy` char '\n'
@@ -19,7 +22,7 @@ line = (,) <$> (int <* string " <-> ") <*> (int `sepBy` string ", ")
 
 int :: Parser Int
 int = do change <- option id (negate <$ char '-')
-         fromInteger . change <$> L.integer
+         fromInteger . change <$> L.decimal
 
 buildgraph :: [(Int, [Int])] -> G.Graph
 buildgraph xs = G.buildG (0, fst $ last xs) alledges

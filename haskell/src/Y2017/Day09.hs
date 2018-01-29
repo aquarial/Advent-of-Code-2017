@@ -1,14 +1,19 @@
 module Y2017.Day09 where
 
+import           Data.Text             (Text)
 import qualified Data.Text             as T
 import qualified Data.Text.IO          as TIO
 
+import           Data.Void
 import           Text.Megaparsec
-import           Text.Megaparsec.Text  (Parser)
+import           Text.Megaparsec.Char
+import qualified Text.Megaparsec.Char.Lexer as L
 
 data Content = Group [Content] | Garbage [Content] | C Char | NA Char
   deriving Show
 
+
+type Parser = Parsec Void Text
 
 inputparser :: Parser Content
 inputparser = group <|> garbage

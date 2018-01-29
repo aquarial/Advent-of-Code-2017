@@ -12,17 +12,19 @@ import qualified Data.Text              as T
 import qualified Data.Text.Encoding     as TE
 import qualified Data.Text.IO           as TIO
 
+import           Data.Void
 import           Text.Megaparsec
-import qualified Text.Megaparsec.Lexer  as L
-import           Text.Megaparsec.Text   (Parser)
+import           Text.Megaparsec.Char
+import qualified Text.Megaparsec.Char.Lexer as L
 
 import           Data.List
 import qualified Data.Map.Strict        as M
 import qualified Data.Set               as S
 
+type Parser = Parsec Void Text
 
 p1 :: Parser [Int]
-p1 = ((fromInteger <$> L.integer) `sepBy` char ',')
+p1 = ((fromInteger <$> L.decimal) `sepBy` char ',')
 
 p2 :: Text -> [Int]
 p2 = map fromIntegral . B.unpack . TE.encodeUtf8
