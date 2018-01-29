@@ -7,9 +7,6 @@ import           Data.Maybe          (catMaybes)
 import           Data.List           (scanl')
 import qualified Data.HashMap.Strict as HMap
 
-tprint :: Show a => a -> IO ()
-tprint = TIO.putStrLn . T.pack . show
-
 main = do
   tprint $ part1 289326
   tprint $ part2 289326
@@ -20,7 +17,6 @@ part1 n = layer + abs( ((n - 1) `mod` (2*layer)) - layer )
   where
     layer = ceiling $ 0.5 * (sqrt floatn - 1)
     floatn = fromIntegral n
-
 
 
 part2 :: Int -> Int
@@ -41,19 +37,19 @@ updateMap oldmap (x0,y0) = HMap.insert (x0,y0) value oldmap
 
 
 spiral :: [(Int, Int)]
-spiral = walk [(0,0), (1,0)]
+spiral = walk (0,0) (cycle [r,u,l,d]) layers
   where
-    walk (x:[]) = x : walk (layer (fst x) x)
-    walk (x:xs) = x : walk xs
+    r (x,y) = (x+1,y)
+    u (x,y) = (x,y+1)
+    l (x,y) = (x-1,y)
+    d (x,y) = (x,y-1)
 
-layer :: Int -> (Int, Int) -> [(Int, Int)]
-layer lay prev = r & d & l & u prev
-  where
-    u (x,y) = [(x,y+t) | t <- [1..2*lay-1]]
-    l (x,y) = [(x-t,y) | t <- [1..2*lay  ]]
-    d (x,y) = [(x,y-t) | t <- [1..2*lay  ]]
-    r (x,y) = [(x+t,y) | t <- [1..2*lay+1]]
+walk :: t -> [t -> t] -> [Int] -> [t]
+walk p (m:moves) (0:steps) =     walk    p     moves       steps
+walk p (m:moves) (s:steps) = p : walk (m p) (m:moves) (s-1:steps)
 
-    infixr 0 &
-    (&) :: (t -> [t]) -> [t] -> [t]
-    (&) dir out = out ++ dir (last out)
+layers :: [Int]
+layers = concat [ [x,x] | x <- [1..]]
+
+tprint :: Show a => a -> IO ()
+tprint = TIO.putStrLn . T.pack . show
