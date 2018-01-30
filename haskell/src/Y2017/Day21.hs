@@ -5,9 +5,10 @@ import           Data.Text             (Text)
 import qualified Data.Text             as T
 import qualified Data.Text.IO          as TIO
 
+import           Data.Void
 import           Text.Megaparsec
-import qualified Text.Megaparsec.Lexer as L
-import           Text.Megaparsec.Text  (Parser)
+import           Text.Megaparsec.Char
+import qualified Text.Megaparsec.Char.Lexer  as L
 
 import           Data.List
 
@@ -69,6 +70,8 @@ data Light = On | Off deriving (Show, Eq)
 type Pattern = [[Light]]
 type Rule = (Pattern, Pattern)
 
+type Parser = Parsec Void Text
+
 p :: Parser [Rule]
 p = line `sepEndBy` char '\n'
 
@@ -86,7 +89,7 @@ plight = (Off <$ char '.') <|> (On <$ char '#')
 
 int :: Parser Int
 int = do change <- option id (negate <$ char '-')
-         fromInteger . change <$> L.integer
+         fromInteger . change <$> L.decimal
 
 
 main :: IO ()

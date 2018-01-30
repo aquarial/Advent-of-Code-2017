@@ -5,9 +5,10 @@ import           Data.Text             (Text)
 import qualified Data.Text             as T
 import qualified Data.Text.IO          as TIO
 
+import           Data.Void
 import           Text.Megaparsec
-import qualified Text.Megaparsec.Lexer as L
-import           Text.Megaparsec.Text  (Parser)
+import           Text.Megaparsec.Char
+import qualified Text.Megaparsec.Char.Lexer  as L
 
 import           Data.List
 import           Data.Function (on)
@@ -36,6 +37,8 @@ tick (Particle p v a) = Particle (tick3 p v2) v2 a
 
 manhatdist (x,y,z) = abs x + abs y + abs z
 
+type Parser = Parsec Void Text
+
 p :: Parser [Particle]
 p = parseparticle `sepEndBy` char '\n'
 
@@ -48,7 +51,7 @@ parseparticle = Particle <$> (string   "p=" *> threenum) <*>
 
 int :: Parser Int
 int = do change <- option id (negate <$ char '-')
-         fromInteger . change <$> L.integer
+         fromInteger . change <$> L.decimal
 
 
 main :: IO ()

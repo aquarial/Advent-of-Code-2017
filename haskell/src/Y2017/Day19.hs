@@ -5,8 +5,10 @@ import           Data.Text             (Text)
 import qualified Data.Text             as T
 import qualified Data.Text.IO          as TIO
 
+import           Data.Void
 import           Text.Megaparsec
-import           Text.Megaparsec.Text  (Parser)
+import           Text.Megaparsec.Char
+import qualified Text.Megaparsec.Char.Lexer  as L
 
 import           Data.List
 import           Data.Maybe
@@ -64,6 +66,8 @@ findstart xs = case findIndex (\x -> get xs (x,0) == V ) [0..] of
 
 toarray :: [[a]] -> V.Vector (V.Vector a)
 toarray es = V.fromList $ map V.fromList es
+
+type Parser = Parsec Void Text
 
 p :: Parser (V.Vector (V.Vector Piece))
 p = toarray <$> many piece `sepEndBy` char '\n'

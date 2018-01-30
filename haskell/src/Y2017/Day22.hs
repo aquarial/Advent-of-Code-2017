@@ -8,9 +8,10 @@ import           Data.Text             (Text)
 import qualified Data.Text             as T
 import qualified Data.Text.IO          as TIO
 
+import           Data.Void
 import           Text.Megaparsec
-import qualified Text.Megaparsec.Lexer as L
-import           Text.Megaparsec.Text  (Parser)
+import           Text.Megaparsec.Char
+import qualified Text.Megaparsec.Char.Lexer  as L
 
 import           Data.List
 import qualified Data.Map.Strict       as M
@@ -65,6 +66,7 @@ move (x,y) D = (x,y+1)
 move (x,y) L = (x-1,y)
 move (x,y) R = (x+1,y)
 
+type Parser = Parsec Void Text
 
 p :: Parser [[Node]]
 p = line `sepEndBy` char '\n'

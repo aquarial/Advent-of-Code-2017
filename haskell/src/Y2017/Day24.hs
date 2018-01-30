@@ -5,9 +5,10 @@ import           Data.Text             (Text)
 import qualified Data.Text             as T
 import qualified Data.Text.IO          as TIO
 
+import           Data.Void
 import           Text.Megaparsec
-import qualified Text.Megaparsec.Lexer as L
-import           Text.Megaparsec.Text  (Parser)
+import           Text.Megaparsec.Char
+import qualified Text.Megaparsec.Char.Lexer  as L
 
 import           Data.List
 
@@ -35,6 +36,8 @@ other c (a, b) = if c == a then b else a
 fits :: Int -> (Int,Int) -> Bool
 fits c (a, b) = c == a || c == b
 
+type Parser = Parsec Void Text
+
 p :: Parser [(Int,Int)]
 p = parsecomp `sepEndBy` char '\n' <* eof
 
@@ -42,7 +45,7 @@ parsecomp = (,) <$> int <* char '/' <*> int
 
 int :: Parser Int
 int = do change <- option id (negate <$ char '-')
-         fromInteger . change <$> L.integer
+         fromInteger . change <$> L.decimal
 
 main :: IO ()
 main = do
