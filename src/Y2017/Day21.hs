@@ -17,17 +17,21 @@ start = case parse ppat "start" ".#./..#/###" of
           Left e -> error "formatting"
           Right x -> x
 
-part1 xs = let lights = length . filter (==On) . concat
-           in lights $ last $  take (5+1) $ iterate (iteration xs) start
+part1 = lightson 5
 
-part2 xs = let lights = length . filter (==On) . concat
-           in lights $ last $  take (18+1) $ iterate (iteration xs) start
+part2 = lightson 18
+
+lightson ::  Int -> [ ( [[Light]] , [[Light]] ) ] -> Int
+lightson n xs = numLights . head . drop n $ iterate (iteration nrules) start
+  where
+    nrules = concat [ zip (allChanges rule) (repeat result) |  (rule, result) <- xs]
+    numLights = length . filter (==On) . concat
 
 iteration rules = joinParts . map (applyRule rules) . breakup
 
-applyRule rules xs = case find (\r -> any (\c -> c == fst r) (allChanges xs)) rules of
+applyRule rules xs = case find (\r -> fst r == xs) rules of
                        Nothing -> error $ "Couldn't match " ++ show (allChanges xs)
-                       Just r ->  snd r
+                       Just (rule,result)  -> result
 
 joinParts :: [[[a]]] -> [[a]]
 joinParts xss = concat $ map createRow $ chunk size xss
@@ -45,8 +49,6 @@ breakup xs = [blocks xs size x0 y0 | y0 <- [0,size..length xs - size]
 
 blocks :: [[a]] -> Int -> Int -> Int -> [[a]]
 blocks xs n x0 y0 = [[xs !! (y0+y) !! (x0+x) | x <- [0..n-1]] | y <- [0..n-1]]
-
-
 
 allChanges :: Show t => [[t]] -> [[[t]]]
 allChanges xs = [f0 (f1 xs) | f0 <- [flipV, flipH, id]
