@@ -14,9 +14,9 @@ import           Data.Bits
 import           Data.List
 
 
-data Gen = Gen { _start  :: Integer
-               , _mult   :: Integer
-               , _filter :: Integer }
+data Gen = Gen { _start  :: Int
+               , _mult   :: Int
+               , _filter :: Int }
 
 generator g = filter picky $ tail $ iterate (\x -> x*(_mult g) `mod` 2147483647) (_start g)
   where picky x = x `mod` (_filter g) == 0
@@ -31,7 +31,7 @@ part2 (a,b) = length $ filter (==0) $ take ( 5*10^6) $ zipWith bitcount ga gb
     ga = generator a
     gb = generator b
 
-bitcount :: Integer -> Integer -> Integer
+bitcount :: Int -> Int -> Int
 bitcount x y = (x `xor` y) .&. (2^16-1)
 
 type Parser = Parsec Void Text
@@ -45,7 +45,7 @@ parsegen = do string "Generator "
               start <- int
               pure $ if name == 'A' then Gen start 16807 4 else Gen start 48271 8
 
-int :: Parser Integer
+int :: Parser Int
 int = do change <- option id (negate <$ char '-')
          fromInteger . change <$> L.decimal
 
