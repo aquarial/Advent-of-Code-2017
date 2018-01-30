@@ -1,4 +1,4 @@
-module Main where
+module Main (main) where
 
 import qualified Y2017.Day01 as D01
 import qualified Y2017.Day02 as D02
