@@ -7,6 +7,13 @@ import qualified Data.Text             as T
 import qualified Data.Text.IO          as TIO
 
 import           Data.List
+import qualified Data.Sequence         as Seq
+
+parta d = take 10 $ walk d 1 (Seq.fromList [0])
+
+--walk :: Int -> Int -> Seq.Seq Int -> [Maybe Int]
+walk d v s = let d2 = (d+1) `mod` (Seq.length s)
+             in (s,d2) : walk d (v+1) (v Seq.<| Seq.drop d2 s  Seq.>< (Seq.take d2 s) )
 
 partb :: Int -> Int
 partb d = millionthInsert 0 0 $ genAfter0Pairs (1,1) 0 d
@@ -28,6 +35,7 @@ genAfter0Pairs (!count, !iters) !pos !distance =
 
 main :: IO ()
 main = do
+  tprint $ parta 3
   tprint $ partb 394
 
 tprint :: Show a => a -> IO ()
