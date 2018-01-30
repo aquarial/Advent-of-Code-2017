@@ -39,7 +39,7 @@ part2 g = length $ G.scc g
 
 main :: IO ()
 main = do
-  input <- TIO.readFile "src/y2017/input12"
+  input <- TIO.readFile "src/Y2017/input12"
   case parse p "input12" input of
     Left err -> TIO.putStr $ T.pack $ parseErrorPretty err
     Right bi -> do

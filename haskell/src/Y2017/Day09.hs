@@ -53,7 +53,7 @@ isChar _     = False
 
 main :: IO ()
 main = do
-  input <- TIO.readFile "src/y2017/input09"
+  input <- TIO.readFile "src/Y2017/input09"
   case parse inputparser "input09" input of
     Left  err   -> tprint err
     Right betterInput -> do

@@ -8,7 +8,7 @@ import           Data.List
 
 main :: IO ()
 main = do
-  input <- TIO.readFile "src/y2017/input04"
+  input <- TIO.readFile "src/Y2017/input04"
   let processed = map (map T.unpack . T.splitOn " ") $ T.lines input
       p1 = length $ filter part1 processed
       p2 = length $ filter part2 processed

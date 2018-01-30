@@ -46,7 +46,7 @@ walk (a,b) NW = (a-1,b)
 
 main :: IO ()
 main = do
-  input <- TIO.readFile "src/y2017/input11"
+  input <- TIO.readFile "src/Y2017/input11"
   case parse p "input11" input of
     Left  err   -> TIO.putStr $ T.pack $ parseErrorPretty err
     Right betterInput -> do
