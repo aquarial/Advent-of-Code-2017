@@ -58,4 +58,3 @@ main = do
 
 tprint :: Show a => a -> IO ()
 tprint = TIO.putStrLn . T.pack . show
-
