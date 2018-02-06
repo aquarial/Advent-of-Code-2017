@@ -16,24 +16,50 @@ executable advent-code
   hs-source-dirs:      src
   main-is:             Main.hs
   default-language:    Haskell2010
-  build-depends:       base >= 4.7 && < 5,
-                       array,
-                       base,
-                       base16-bytestring,
-                       base64-bytestring,
-                       bytestring,
-                       containers,
-                       criterion >= 1.2,
-                       diagrams,
-                       diagrams-lib,
-                       diagrams-svg,
-                       digits,
-                       hashable,
-                       lens,
-                       megaparsec == 6.3.0,
-                       split,
-                       primes,
-                       text,
-                       unordered-containers,
-                       vector,
-                       wreq
+  ghc-options: -O2
+  build-depends:       base >= 4.7 && < 5
+                     , array
+                     , base16-bytestring
+                     , base64-bytestring
+                     , bytestring
+                     , containers
+                     , criterion >= 1.2
+                     , diagrams
+                     , diagrams-lib
+                     , diagrams-svg
+                     , digits
+                     , hashable
+                     , hash-graph
+                     , lens
+                     , megaparsec == 6.3.0
+                     , split
+                     , primes
+                     , text
+                     , unordered-containers
+                     , vector
+                     , wreq
+  other-modules:       Y2017.Day01
+                       Y2017.Day02
+                       Y2017.Day03
+                       Y2017.Day04
+                       Y2017.Day05
+                       Y2017.Day06
+                       Y2017.Day07
+                       Y2017.Day08
+                       Y2017.Day09
+                       Y2017.Day10
+                       Y2017.Day11
+                       Y2017.Day12
+                       Y2017.Day13
+                       Y2017.Day14
+                       Y2017.Day15
+                       Y2017.Day16
+                       Y2017.Day17
+                       Y2017.Day18
+                       Y2017.Day19
+                       Y2017.Day20
+                       Y2017.Day21
+                       Y2017.Day22
+                       Y2017.Day23
+                       Y2017.Day24
+                       Y2017.Day25
