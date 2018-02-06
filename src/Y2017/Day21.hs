@@ -30,30 +30,30 @@ start = case parse ppat "" ".#./..#/###" of
 --  where
 --    numLights = length . filter (==On) . concat
 
-walkRuleGraphN :: G.Gr Int Rule -> Int -> [(Int, Rule)] -> [(Int, Rule)]
+walkRuleGraphN :: G.Gr Int Pattern -> Int -> [(Int, Pattern)] -> [(Int, Pattern)]
 walkRuleGraphN gr n rs = head $ drop n $ iterate (walkRuleGraph gr) rs
 
-walkRuleGraph :: G.Gr Int Rule -> [(Int, Rule)] -> [(Int, Rule)]
+walkRuleGraph :: G.Gr Int Pattern -> [(Int, Pattern)] -> [(Int, Pattern)]
 walkRuleGraph gr rs = reduceRuleGraph (concatMap (nextRules gr) rs)
 
-buildRuleGraph :: [Rule] -> G.Gr Int Rule
-buildRuleGraph rs = G.mkGraph edgs rs
+buildRuleGraph :: [Rule] -> G.Gr Int Pattern
+buildRuleGraph rs = G.mkGraph edgs (map fst rs)
   where
-    edgs = [ G.Edge r w (r2,undefined) | r <- rs
-                                       , (w,r2) <- generateRuleWeights rs r]
+    edgs = [ G.Edge (fst r) w r2 | r <- rs
+                                 , (w,r2) <- generateRuleWeights rs (fst r)]
 
-generateRuleWeights :: [Rule] -> (Pattern, z) -> [(Int, Pattern)]
-generateRuleWeights rs r = count $ breakup (iteration rs (iteration rs (fst r)))
+generateRuleWeights :: [Rule] -> Pattern -> [(Int, Pattern)]
+generateRuleWeights rs r = count $ breakup (iteration rs (iteration rs r))
   where
     count :: Eq a => [a] -> [(Int, a)]
     count [] = []
     count (x:xs) = (1+length (filter (==x) xs), x):count (filter (/=x) xs)
 
-reduceRuleGraph :: [(Int, Rule)] -> [(Int, Rule)]
+reduceRuleGraph :: [(Int, Pattern)] -> [(Int, Pattern)]
 reduceRuleGraph ((i,r):rs) = let (same,rest) = partition ((==) r . snd) rs
                              in (i+sum (map fst same), r): reduceRuleGraph rs
 
-nextRules :: G.Gr Int Rule -> (Int, Rule) -> [(Int, Rule)]
+nextRules :: G.Gr Int Pattern -> (Int, Pattern) -> [(Int, Pattern)]
 nextRules gr (i,r) = map toTuple $ S.toList $ G.tails $ gr G.! r
   where
     toTuple (G.Tail w r2) = (i*w, r2)
