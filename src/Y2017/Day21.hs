@@ -19,16 +19,15 @@ import qualified Data.HashGraph.Strict as G
 import qualified Data.HashSet as S
 import qualified Data.Hashable as Hashable
 
-start :: [[Light]]
+start :: Pattern
 start = case parse ppat "" ".#./..#/###" of
           Left e -> error "formatting"
           Right x -> x
 
-
-----evalGraph :: [(Int, Rule)] ->
---evalGraph rs = map (\(i,r) -> i * numLights (fst ))
---  where
---    numLights = length . filter (==On) . concat
+evalGraph :: [(Int, Pattern)] -> Int
+evalGraph ps = sum $ map (\(i,p) -> i * numLights p) ps
+  where
+    numLights = length . filter (==On) . concat
 
 walkRuleGraphN :: G.Gr Int Pattern -> Int -> [(Int, Pattern)] -> [(Int, Pattern)]
 walkRuleGraphN gr n rs = head $ drop n $ iterate (walkRuleGraph gr) rs
@@ -60,7 +59,9 @@ nextRules gr (i,r) = map toTuple $ S.toList $ G.tails $ gr G.! r
 
 part1 = lightson 5
 
-part2 = lightson 18
+part2 :: [Rule] -> Int
+part2 rs = evalGraph $ walkRuleGraphN (buildRuleGraph rs) 18 [(1, start)]
+--part2 = lightson 18
 
 --iterInfo :: [Rule] -> M.Map Pattern (M.Map Pattern Int)
 ---iterInfo rs = map (\i -> iteration rs (iteration rs i)) $ filter ((==) 3 . length) rs
