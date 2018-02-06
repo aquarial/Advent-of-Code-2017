@@ -2,4 +2,4 @@
 
 Advent of code in Haskell lts-10.4
 
-![Criterion Benchmark Report](./criterion-report.html)
+[Criterion Benchmark Report](./bencmarks/criterion-report-simple.html)
