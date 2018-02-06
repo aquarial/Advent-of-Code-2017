@@ -1,4 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
 module Y2017.Day21 where
 
 import           Data.Text             (Text)
@@ -10,16 +12,60 @@ import           Text.Megaparsec
 import           Text.Megaparsec.Char
 import qualified Text.Megaparsec.Char.Lexer  as L
 
+import           GHC.Generics
 import           Data.List
+import qualified Data.Map as M
+import qualified Data.HashGraph.Strict as G
+import qualified Data.HashSet as S
+import qualified Data.Hashable as Hashable
 
 start :: [[Light]]
 start = case parse ppat "" ".#./..#/###" of
           Left e -> error "formatting"
           Right x -> x
 
+
+----evalGraph :: [(Int, Rule)] ->
+--evalGraph rs = map (\(i,r) -> i * numLights (fst ))
+--  where
+--    numLights = length . filter (==On) . concat
+
+walkRuleGraphN :: G.Gr Int Rule -> Int -> [(Int, Rule)] -> [(Int, Rule)]
+walkRuleGraphN gr n rs = head $ drop n $ iterate (walkRuleGraph gr) rs
+
+walkRuleGraph :: G.Gr Int Rule -> [(Int, Rule)] -> [(Int, Rule)]
+walkRuleGraph gr rs = reduceRuleGraph (concatMap (nextRules gr) rs)
+
+buildRuleGraph :: [Rule] -> G.Gr Int Rule
+buildRuleGraph rs = G.mkGraph edgs rs
+  where
+    edgs = [ G.Edge r w (r2,undefined) | r <- rs
+                                       , (w,r2) <- generateRuleWeights rs r]
+
+generateRuleWeights :: [Rule] -> (Pattern, z) -> [(Int, Pattern)]
+generateRuleWeights rs r = count $ breakup (iteration rs (iteration rs (fst r)))
+  where
+    count :: Eq a => [a] -> [(Int, a)]
+    count [] = []
+    count (x:xs) = (1+length (filter (==x) xs), x):count (filter (/=x) xs)
+
+reduceRuleGraph :: [(Int, Rule)] -> [(Int, Rule)]
+reduceRuleGraph ((i,r):rs) = let (same,rest) = partition ((==) r . snd) rs
+                             in (i+sum (map fst same), r): reduceRuleGraph rs
+
+nextRules :: G.Gr Int Rule -> (Int, Rule) -> [(Int, Rule)]
+nextRules gr (i,r) = map toTuple $ S.toList $ G.tails $ gr G.! r
+  where
+    toTuple (G.Tail w r2) = (i*w, r2)
+
 part1 = lightson 5
 
 part2 = lightson 18
+
+--iterInfo :: [Rule] -> M.Map Pattern (M.Map Pattern Int)
+---iterInfo rs = map (\i -> iteration rs (iteration rs i)) $ filter ((==) 3 . length) rs
+--  where
+--    count r = M.insertWith (+) r
 
 lightson ::  Int -> [ ( [[Light]] , [[Light]] ) ] -> Int
 lightson n xs = numLights . head . drop n $ iterate (iteration nrules) start
@@ -63,10 +109,9 @@ flipV = reverse
 
 rotate = flipV . transpose
 
-data Light = On | Off deriving (Show, Eq)
+data Light = On | Off deriving (Show, Eq, Ord, Generic, Hashable.Hashable)
 type Pattern = [[Light]]
 type Rule = (Pattern, Pattern)
-
 
 type Parser = Parsec Void Text
 
