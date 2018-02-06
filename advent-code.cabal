@@ -23,6 +23,7 @@ executable advent-code
                        base64-bytestring,
                        bytestring,
                        containers,
+                       criterion >= 1.2,
                        diagrams,
                        diagrams-lib,
                        diagrams-svg,
