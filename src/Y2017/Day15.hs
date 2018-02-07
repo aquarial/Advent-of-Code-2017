@@ -19,8 +19,11 @@ data Gen = Gen { _start  :: !Int
                , _filter :: !Int }
 
 generator :: Gen -> [Int]
-generator g = filter picky $ tail $ iterate (\x -> x*(_mult g) `rem` 2147483647) (_start g)
-  where picky x = x `rem` (_filter g) == 0
+generator g = filter ((==0) . (`rem` f)) $ tail $ iterate (\x -> x*m `rem` 2147483647) s
+  where
+    s = _start g
+    m = _mult g
+    f = _filter g
 
 part1 :: (Gen, Gen) -> Int
 part1 (a,b) = length $ filter (==0) $ take (40*10^6) $ zipWith bitcount ga gb
