@@ -9,7 +9,7 @@ import qualified Data.Text             as T
 import qualified Data.Text.IO          as TIO
 
 import           Data.Void
-import           Text.Megaparsec
+import           Text.Megaparsec hiding (Pos)
 import           Text.Megaparsec.Char
 import qualified Text.Megaparsec.Char.Lexer  as L
 
@@ -21,16 +21,18 @@ data Node = Clean | Weakened | Infect | Flagged deriving (Show, Eq)
 data Action = Cleaning | Infecting deriving (Show, Eq)
 
 data Dir = U | L | R | D deriving (Show, Eq)
-data Pos = Pos (Int,Int) Dir deriving (Show, Eq)
+data Pos = Pos !(Int,Int) !Dir deriving (Show, Eq)
 
 
 -- 5411
 -- 5567
+parta :: [[Node]] -> Int
 parta x = foldl1' (+) . take (10^7) . walk $ ss
   where
     s = setup x
     ss = seq s s
 
+setup :: [[Node]] -> (Pos, M.Map (Int, Int) Node)
 setup xs = (pos, board)
   where
     y = length xs `div` 2
@@ -42,6 +44,7 @@ setup xs = (pos, board)
 data Turn = TurnL | TurnR | Opposite | None
 
 
+walk :: (Pos, M.Map (Int, Int) Node) -> [Int]
 walk (Pos !p !d, !b) = case M.findWithDefault Clean p b of
                           Clean ->    0:walk (newpos TurnL   , M.insert p Weakened b)
                           Weakened -> 1:walk (newpos None    , M.insert p Infect   b)
@@ -59,10 +62,11 @@ turnleft D = R
 turnleft R = U
 turnright = turnleft . turnleft . turnleft
 opposite = turnleft . turnleft
-move (x,y) U = (x,y-1)
-move (x,y) D = (x,y+1)
-move (x,y) L = (x-1,y)
-move (x,y) R = (x+1,y)
+
+move (!x,!y) !U = (x,y-1)
+move (!x,!y) !D = (x,y+1)
+move (!x,!y) !L = (x-1,y)
+move (!x,!y) !R = (x+1,y)
 
 type Parser = Parsec Void Text
 
@@ -70,6 +74,7 @@ p :: Parser [[Node]]
 p = line `sepEndBy` char '\n'
 
 
+line :: Parser [Node]
 line = some $ (Clean <$ char '.') <|> (Infect <$ char '#')
 
 main :: IO ()

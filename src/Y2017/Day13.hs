@@ -48,7 +48,7 @@ main = do
   case parse p "input13" input of
     Left err -> TIO.putStr $ T.pack $ parseErrorPretty err
     Right bi -> do
-      --tprint $ part1 bi
+      tprint $ part1 bi
       tprint $ part2 bi
 
 tprint :: Show a => a -> IO ()

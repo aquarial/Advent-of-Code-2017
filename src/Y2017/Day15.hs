@@ -14,9 +14,9 @@ import           Data.Bits
 import           Data.List
 
 
-data Gen = Gen { _start  :: Int
-               , _mult   :: Int
-               , _filter :: Int }
+data Gen = Gen { _start  :: !Int
+               , _mult   :: !Int
+               , _filter :: !Int }
 
 generator g = filter picky $ tail $ iterate (\x -> x*(_mult g) `mod` 2147483647) (_start g)
   where picky x = x `mod` (_filter g) == 0
