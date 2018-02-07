@@ -24,13 +24,11 @@ data Dir = U | L | R | D deriving (Show, Eq)
 data Pos = Pos !(Int,Int) !Dir deriving (Show, Eq)
 
 
--- 5411
--- 5567
 parta :: [[Node]] -> Int
-parta x = foldl1' (+) . take (10^7) . walk $ ss
-  where
-    s = setup x
-    ss = seq s s
+parta = foldl1' (+) . take (10^4) . walka . setup
+
+partb :: [[Node]] -> Int
+partb = foldl1' (+) . take (10^7) . walkb . setup
 
 setup :: [[Node]] -> (Pos, M.Map (Int, Int) Node)
 setup xs = (pos, board)
@@ -44,12 +42,20 @@ setup xs = (pos, board)
 data Turn = TurnL | TurnR | Opposite | None
 
 
-walk :: (Pos, M.Map (Int, Int) Node) -> [Int]
-walk (Pos !p !d, !b) = case M.findWithDefault Clean p b of
-                          Clean ->    0:walk (newpos TurnL   , M.insert p Weakened b)
-                          Weakened -> 1:walk (newpos None    , M.insert p Infect   b)
-                          Infect ->   0:walk (newpos TurnR   , M.insert p Flagged  b)
-                          Flagged ->  0:walk (newpos Opposite, M.insert p Clean    b)
+walka :: (Pos, M.Map (Int, Int) Node) -> [Int]
+walka (Pos !p !d, !b) = case M.findWithDefault Clean p b of
+                          Clean  -> 1:walka (newpos TurnL, M.insert p Infect b)
+                          Infect -> 0:walka (newpos TurnR, M.insert p Clean  b)
+  where
+    newpos TurnL = Pos (move p (turnleft  d)) (turnleft  d)
+    newpos TurnR = Pos (move p (turnright d)) (turnright d)
+
+walkb :: (Pos, M.Map (Int, Int) Node) -> [Int]
+walkb (Pos !p !d, !b) = case M.findWithDefault Clean p b of
+                          Clean ->    0:walkb (newpos TurnL   , M.insert p Weakened b)
+                          Weakened -> 1:walkb (newpos None    , M.insert p Infect   b)
+                          Infect ->   0:walkb (newpos TurnR   , M.insert p Flagged  b)
+                          Flagged ->  0:walkb (newpos Opposite, M.insert p Clean    b)
   where
     newpos TurnL =    Pos (move p (turnleft  d)) (turnleft  d)
     newpos TurnR =    Pos (move p (turnright d)) (turnright d)
@@ -84,6 +90,7 @@ main = do
     Left err -> TIO.putStr $ T.pack $ parseErrorPretty err
     Right bi -> do
       tprint $ parta bi
+      tprint $ partb bi
 
 tprint :: Show a => a -> IO ()
 tprint = TIO.putStrLn . T.pack . show
