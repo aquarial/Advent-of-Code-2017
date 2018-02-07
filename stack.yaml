@@ -37,6 +37,11 @@ resolver: lts-10.4
 # will not be run. This is useful for tweaking upstream packages.
 packages:
 - .
+- location:
+    git: git@github.com:patrickdoc/hash-graph.git
+    commit: 64029abc44174812ab691bff268bf7ded06de1f9
+  extra-dep: true
+
 # Dependency packages to be pulled from upstream that are not in the resolver
 # (e.g., acme-missiles-0.3)
 extra-deps: []

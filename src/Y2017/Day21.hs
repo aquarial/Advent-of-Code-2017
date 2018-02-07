@@ -12,6 +12,7 @@ import           Text.Megaparsec
 import           Text.Megaparsec.Char
 import qualified Text.Megaparsec.Char.Lexer  as L
 
+import           Debug.Trace
 import           GHC.Generics
 import           Data.List
 import qualified Data.Map as M
@@ -30,7 +31,8 @@ evalGraph ps = sum $ map (\(i,p) -> i * numLights p) ps
     numLights = length . filter (==On) . concat
 
 --walkRuleGraphN :: G.Gr Int Pattern -> Int -> [(Int, Pattern)] -> [(Int, Pattern)]
-walkRuleGraphN gr n rs = drop n $ iterate (walkRuleGraph gr) rs
+walkRuleGraphN ::   G.Gr Int Pattern -> Int -> [(Int, Pattern)] -> [[(Int, Pattern)]]
+walkRuleGraphN gr n rs = {-head $ drop n $-} iterate (walkRuleGraph gr) rs
 
 walkRuleGraph :: G.Gr Int Pattern -> [(Int, Pattern)] -> [(Int, Pattern)]
 walkRuleGraph gr ps = reduceRuleGraph (concatMap (nextRules gr) ps)
@@ -51,12 +53,12 @@ generateRuleWeights rs r = count $ map (fst . applyRule rs) $ breakup (iteration
 
 reduceRuleGraph :: [(Int, Pattern)] -> [(Int, Pattern)]
 reduceRuleGraph [] = []
-reduceRuleGraph ((i,r):rs) = let (same,rest) = partition ((==) r . snd) rs
-                             in (i+sum (map fst same), r): reduceRuleGraph rs
+reduceRuleGraph ((i,p):ps) = let (same,rest) = partition ((==) p . snd) ps
+                             in (i+sum (map fst same), p): reduceRuleGraph ps
 
 nextRules :: G.Gr Int Pattern -> (Int, Pattern) -> [(Int, Pattern)]
 nextRules gr (i,p) = case gr G.!? p of
-                       Nothing -> []
+                       Nothing -> trace (show p) []
                        Just ctx -> map toTuple $ S.toList $ G.tails ctx
   where
     toTuple (G.Tail w r2) = (i*w, r2)
@@ -66,7 +68,7 @@ part1 rs = map (\n -> lightson n rs) [0..6]
 
 --part2 rs = evalGraph $ generateRuleWeights rs start
 --part2 rs = walkRuleGraphN ( buildRuleGraph rs) 1 [(1,s) | s <- allChanges start]
-part2 rs = take 3 $ map evalGraph $ walkRuleGraphN (buildRuleGraph rs) 0 [(1,s) | s <- allChanges start]
+part2 rs = take 4 $ map (evalGraph) $  walkRuleGraphN (buildRuleGraph rs) 0 [(1,start)]
 --part2 = lightson 18
 
 
