@@ -2,7 +2,7 @@
 
 Advent of code in Haskell lts-10.4
 
-[Criterion Benchmark Report](./benchmarks/criterion-report-3.pdf)
+[Criterion Benchmark Report](./benchmarks/criterion-report-3.html)
 
 
     Slowest (in seconds):
