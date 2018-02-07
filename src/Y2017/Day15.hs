@@ -18,14 +18,17 @@ data Gen = Gen { _start  :: !Int
                , _mult   :: !Int
                , _filter :: !Int }
 
-generator g = filter picky $ tail $ iterate (\x -> x*(_mult g) `mod` 2147483647) (_start g)
-  where picky x = x `mod` (_filter g) == 0
+generator :: Gen -> [Int]
+generator g = filter picky $ tail $ iterate (\x -> x*(_mult g) `rem` 2147483647) (_start g)
+  where picky x = x `rem` (_filter g) == 0
 
+part1 :: (Gen, Gen) -> Int
 part1 (a,b) = length $ filter (==0) $ take (40*10^6) $ zipWith bitcount ga gb
   where
     ga = generator $ a { _filter = 1 }
     gb = generator $ b { _filter = 1}
 
+part2 :: (Gen, Gen) -> Int
 part2 (a,b) = length $ filter (==0) $ take ( 5*10^6) $ zipWith bitcount ga gb
   where
     ga = generator a
@@ -37,9 +40,10 @@ bitcount x y = (x `xor` y) .&. (2^16-1)
 type Parser = Parsec Void Text
 
 p :: Parser (Gen, Gen)
-p = (,) <$> parsegen <* char '\n' <*> parsegen
+p = (,) <$> parseGen <* char '\n' <*> parseGen
 
-parsegen = do string "Generator "
+parseGen :: Parser Gen
+parseGen = do string "Generator "
               name <- oneOf ['A','B']
               string " starts with "
               start <- int
