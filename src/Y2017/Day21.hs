@@ -53,7 +53,7 @@ generateRuleWeights rs r = count $ map (fst . applyRule rs) $ breakup (iteration
 reduceRuleGraph :: [(Int, Pattern)] -> [(Int, Pattern)]
 reduceRuleGraph [] = []
 reduceRuleGraph ((i,p):ps) = let (same,rest) = partition ((==) p . snd) ps
-                             in (i+sum (map fst same), p): reduceRuleGraph ps
+                             in (i+sum (map fst same), p) : reduceRuleGraph rest
 
 nextRules :: G.Gr Int Pattern -> (Int, Pattern) -> [(Int, Pattern)]
 nextRules gr (i,p) = case gr G.!? p of
