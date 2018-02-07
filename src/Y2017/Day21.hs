@@ -30,19 +30,20 @@ evalGraph ps = sum $ map (\(i,p) -> i * numLights p) ps
     numLights = length . filter (==On) . concat
 
 --walkRuleGraphN :: G.Gr Int Pattern -> Int -> [(Int, Pattern)] -> [(Int, Pattern)]
-walkRuleGraphN gr n rs = drop n $ iterate (walkRuleGraph gr ) rs
+walkRuleGraphN gr n rs = drop n $ iterate (walkRuleGraph gr) rs
 
-walkRuleGraph :: G.Gr Int Pattern -> [Rule] -> [(Int, Pattern)] -> [(Int, Pattern)]
-walkRuleGraph gr rs ps = reduceRuleGraph (concatMap (nextRules gr rs) ps)
+walkRuleGraph :: G.Gr Int Pattern -> [(Int, Pattern)] -> [(Int, Pattern)]
+walkRuleGraph gr ps = reduceRuleGraph (concatMap (nextRules gr) ps)
 
 buildRuleGraph :: [Rule] -> G.Gr Int Pattern
 buildRuleGraph rs = G.mkGraph edgs (map fst rs)
   where
     edgs = [ G.Edge (fst r) w r2 | r <- rs
+                                 , length (fst r) == 3
                                  , (w,r2) <- generateRuleWeights rs (fst r)]
 
 generateRuleWeights :: [Rule] -> Pattern -> [(Int, Pattern)]
-generateRuleWeights rs r = count $ breakup (iteration rs (iteration rs (iteration rs r)))
+generateRuleWeights rs r = count $ map (fst . applyRule rs) $ breakup (iteration rs (iteration rs (iteration rs r)))
   where
     count :: Eq a => [a] -> [(Int, a)]
     count [] = []
@@ -53,25 +54,21 @@ reduceRuleGraph [] = []
 reduceRuleGraph ((i,r):rs) = let (same,rest) = partition ((==) r . snd) rs
                              in (i+sum (map fst same), r): reduceRuleGraph rs
 
-nextRules :: G.Gr Int Pattern -> [Rule] -> (Int, Pattern) -> [(Int, Pattern)]
-nextRules gr rs (i,p) = map linked (applyRule rs p)
+nextRules :: G.Gr Int Pattern -> (Int, Pattern) -> [(Int, Pattern)]
+nextRules gr (i,p) = case gr G.!? p of
+                       Nothing -> []
+                       Just ctx -> map toTuple $ S.toList $ G.tails ctx
   where
-    linked p = case gr G.!? p of
-                     Nothing -> []
-                     Just ctx -> map toTuple $ S.toList $ G.tails ctx
-
     toTuple (G.Tail w r2) = (i*w, r2)
 
 part1 rs = map (\n -> lightson n rs) [0..6]
 
+
+--part2 rs = evalGraph $ generateRuleWeights rs start
 --part2 rs = walkRuleGraphN ( buildRuleGraph rs) 1 [(1,s) | s <- allChanges start]
-part2 rs = take 10 $ map evalGraph $ walkRuleGraphN (buildRuleGraph rs) 0 [(1,s) | s <- allChanges start]
+part2 rs = take 3 $ map evalGraph $ walkRuleGraphN (buildRuleGraph rs) 0 [(1,s) | s <- allChanges start]
 --part2 = lightson 18
 
---iterInfo :: [Rule] -> M.Map Pattern (M.Map Pattern Int)
----iterInfo rs = map (\i -> iteration rs (iteration rs i)) $ filter ((==) 3 . length) rs
---  where
---    count r = M.insertWith (+) r
 
 lightson ::  Int -> [Rule] -> Int
 lightson n xs = numLights . head . drop n $ iterate (iteration nrules) start
@@ -80,12 +77,12 @@ lightson n xs = numLights . head . drop n $ iterate (iteration nrules) start
     numLights = length . filter (==On) . concat
 
 iteration :: [Rule] -> Pattern -> Pattern
-iteration rules = joinParts . map (applyRule rules) . breakup
+iteration rules = joinParts . map (snd . applyRule rules) . breakup
 
-applyRule :: [Rule] -> Pattern -> Pattern
+applyRule :: [Rule] -> Pattern -> Rule
 applyRule rules xs = case find (\r -> any ((==) (fst r)) (allChanges xs) ) rules of
                        Nothing -> error $ "Couldn't match " ++ show xs
-                       Just (rule,result)  -> result
+                       Just rule  -> rule
 
 joinParts :: [[[Light]]] -> Pattern
 joinParts xss = concat $ map createRow $ chunk size xss
