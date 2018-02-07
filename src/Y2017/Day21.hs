@@ -29,11 +29,11 @@ evalGraph ps = sum $ map (\(i,p) -> i * numLights p) ps
   where
     numLights = length . filter (==On) . concat
 
-walkRuleGraphN :: G.Gr Int Pattern -> Int -> [(Int, Pattern)] -> [(Int, Pattern)]
-walkRuleGraphN gr n rs = head $ drop n $ iterate (walkRuleGraph gr) rs
+--walkRuleGraphN :: G.Gr Int Pattern -> Int -> [(Int, Pattern)] -> [(Int, Pattern)]
+walkRuleGraphN gr n rs = drop n $ iterate (walkRuleGraph gr ) rs
 
-walkRuleGraph :: G.Gr Int Pattern -> [(Int, Pattern)] -> [(Int, Pattern)]
-walkRuleGraph gr rs = reduceRuleGraph (concatMap (nextRules gr) rs)
+walkRuleGraph :: G.Gr Int Pattern -> [Rule] -> [(Int, Pattern)] -> [(Int, Pattern)]
+walkRuleGraph gr rs ps = reduceRuleGraph (concatMap (nextRules gr rs) ps)
 
 buildRuleGraph :: [Rule] -> G.Gr Int Pattern
 buildRuleGraph rs = G.mkGraph edgs (map fst rs)
@@ -42,25 +42,30 @@ buildRuleGraph rs = G.mkGraph edgs (map fst rs)
                                  , (w,r2) <- generateRuleWeights rs (fst r)]
 
 generateRuleWeights :: [Rule] -> Pattern -> [(Int, Pattern)]
-generateRuleWeights rs r = count $ breakup (iteration rs (iteration rs r))
+generateRuleWeights rs r = count $ breakup (iteration rs (iteration rs (iteration rs r)))
   where
     count :: Eq a => [a] -> [(Int, a)]
     count [] = []
     count (x:xs) = (1+length (filter (==x) xs), x):count (filter (/=x) xs)
 
 reduceRuleGraph :: [(Int, Pattern)] -> [(Int, Pattern)]
+reduceRuleGraph [] = []
 reduceRuleGraph ((i,r):rs) = let (same,rest) = partition ((==) r . snd) rs
                              in (i+sum (map fst same), r): reduceRuleGraph rs
 
-nextRules :: G.Gr Int Pattern -> (Int, Pattern) -> [(Int, Pattern)]
-nextRules gr (i,r) = map toTuple $ S.toList $ G.tails $ gr G.! r
+nextRules :: G.Gr Int Pattern -> [Rule] -> (Int, Pattern) -> [(Int, Pattern)]
+nextRules gr rs (i,p) = map linked (applyRule rs p)
   where
+    linked p = case gr G.!? p of
+                     Nothing -> []
+                     Just ctx -> map toTuple $ S.toList $ G.tails ctx
+
     toTuple (G.Tail w r2) = (i*w, r2)
 
-part1 = lightson 5
+part1 rs = map (\n -> lightson n rs) [0..6]
 
-part2 :: [Rule] -> Int
-part2 rs = evalGraph $ walkRuleGraphN (buildRuleGraph rs) 18 [(1, start)]
+--part2 rs = walkRuleGraphN ( buildRuleGraph rs) 1 [(1,s) | s <- allChanges start]
+part2 rs = take 10 $ map evalGraph $ walkRuleGraphN (buildRuleGraph rs) 0 [(1,s) | s <- allChanges start]
 --part2 = lightson 18
 
 --iterInfo :: [Rule] -> M.Map Pattern (M.Map Pattern Int)
@@ -68,7 +73,7 @@ part2 rs = evalGraph $ walkRuleGraphN (buildRuleGraph rs) 18 [(1, start)]
 --  where
 --    count r = M.insertWith (+) r
 
-lightson ::  Int -> [ ( [[Light]] , [[Light]] ) ] -> Int
+lightson ::  Int -> [Rule] -> Int
 lightson n xs = numLights . head . drop n $ iterate (iteration nrules) start
   where
     nrules = concat [ zip (allChanges rule) (repeat result) |  (rule, result) <- xs]
@@ -78,8 +83,8 @@ iteration :: [Rule] -> Pattern -> Pattern
 iteration rules = joinParts . map (applyRule rules) . breakup
 
 applyRule :: [Rule] -> Pattern -> Pattern
-applyRule rules xs = case find (\r -> fst r == xs) rules of
-                       Nothing -> error $ "Couldn't match " ++ show (allChanges xs)
+applyRule rules xs = case find (\r -> any ((==) (fst r)) (allChanges xs) ) rules of
+                       Nothing -> error $ "Couldn't match " ++ show xs
                        Just (rule,result)  -> result
 
 joinParts :: [[[Light]]] -> Pattern
@@ -91,7 +96,7 @@ joinParts xss = concat $ map createRow $ chunk size xss
 chunk n [] = []
 chunk n xs = take n xs : chunk n (drop n xs)
 
-breakup :: [[a]] -> [[[a]]]
+breakup :: Pattern -> [Pattern]
 breakup xs = [blocks xs size x0 y0 | y0 <- [0,size..length xs - size]
                                    , x0 <- [0,size..length xs - size]]
   where
@@ -102,7 +107,7 @@ breakup xs = [blocks xs size x0 y0 | y0 <- [0,size..length xs - size]
 blocks :: [[a]] -> Int -> Int -> Int -> [[a]]
 blocks xs n x0 y0 = [[xs !! (y0+y) !! (x0+x) | x <- [0..n-1]] | y <- [0..n-1]]
 
-allChanges :: Show t => [[t]] -> [[[t]]]
+allChanges :: Pattern -> [Pattern]
 allChanges xs = [f0 (f1 xs) | f0 <- [id, flipV]
                             , f1 <- [id, rotate, rotate.rotate, rotate.rotate.rotate] ]
 
