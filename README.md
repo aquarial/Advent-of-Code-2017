@@ -2,6 +2,10 @@
 
 Advent of code in Haskell lts-10.4
 
+Remember that benchmarks aren't perfect, and can vary between runs for a variety
+of reasons. I use them to see which days I need to optimize (pretty obvious),
+not gather absolute data on.
+
     Slowest (in seconds):
 
     - Day 15 11.5
