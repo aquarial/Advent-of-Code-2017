@@ -17,7 +17,11 @@ import qualified Data.Graph            as G
 
 data Move = Spin Int | Exchange Int Int | Partner Char Char
 
-parta moves = iterate (dance moves) ['a'..'p'] !! ((10^9) `mod` loop)
+parta :: [Move] -> [Char]
+parta moves = dance moves ['a'..'p']
+
+partb :: [Move] -> [Char]
+partb moves = iterate (dance moves) ['a'..'p'] !! ((10^9) `mod` loop)
   where loop = findloop $ iterate (dance moves) ['a'..'p']
 
 findloop xs = walk 0 S.empty xs
@@ -32,11 +36,13 @@ domove ds (Partner pa pb) = case (elemIndex pa ds, elemIndex pb ds) of
                               (Just ax, Just bx) -> domove ds (Exchange ax bx)
                               _                  -> ds
 
+rotateL :: Int -> [a] -> [a]
 rotateL dx xs = drop dx xs ++ take dx xs
 
+replace :: Int -> a -> [a] -> [a]
 replace i x []     = []
-replace 0 x (a:as) = x:as
-replace i x (a:as) = a : replace (i-1) x as
+replace 0 x (y:ys) = x:ys
+replace i x (y:ys) = y : replace (i-1) x ys
 
 
 type Parser = Parsec Void Text
@@ -44,6 +50,7 @@ type Parser = Parsec Void Text
 p :: Parser [Move]
 p = pmove `sepBy` char ','
 
+pmove :: Parser Move
 pmove = Spin <$> (char 's' *> int) <|>
         Exchange <$> (char 'x' *> int) <*> (char '/' *> int) <|>
         Partner <$> (char 'p' *> anyChar) <*> (char '/' *> anyChar)
@@ -63,7 +70,10 @@ main = do
   case parse p "input16" input of
     Left err -> TIO.putStr $ T.pack $ parseErrorPretty err
     Right bi -> do
-      tprint $ parta bi
+      TIO.putStrLn . T.pack $ parta bi
+      TIO.putStrLn . T.pack $ partb bi
+
+
 
 tprint :: Show a => a -> IO ()
 tprint = TIO.putStrLn . T.pack . show
