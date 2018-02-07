@@ -30,9 +30,8 @@ evalGraph ps = sum $ map (\(i,p) -> i * numLights p) ps
   where
     numLights = length . filter (==On) . concat
 
---walkRuleGraphN :: G.Gr Int Pattern -> Int -> [(Int, Pattern)] -> [(Int, Pattern)]
-walkRuleGraphN ::   G.Gr Int Pattern -> Int -> [(Int, Pattern)] -> [[(Int, Pattern)]]
-walkRuleGraphN gr n rs = {-head $ drop n $-} iterate (walkRuleGraph gr) rs
+walkRuleGraphN :: G.Gr Int Pattern -> Int -> [(Int, Pattern)] -> [(Int, Pattern)]
+walkRuleGraphN gr n rs = head $ drop n $ iterate (walkRuleGraph gr) rs
 
 walkRuleGraph :: G.Gr Int Pattern -> [(Int, Pattern)] -> [(Int, Pattern)]
 walkRuleGraph gr ps = reduceRuleGraph (concatMap (nextRules gr) ps)
@@ -63,19 +62,17 @@ nextRules gr (i,p) = case gr G.!? p of
   where
     toTuple (G.Tail w r2) = (i*w, r2)
 
-part1 rs = map (\n -> lightson n rs) [0..6]
+
+part1 = lightson 6
+
+part2 rs = evalGraph $ walkRuleGraphN (buildRuleGraph rs) 6 [(1,fst (applyRule rs start))]
 
 
---part2 rs = evalGraph $ generateRuleWeights rs start
---part2 rs = walkRuleGraphN ( buildRuleGraph rs) 1 [(1,s) | s <- allChanges start]
-part2 rs = take 4 $ map (evalGraph) $  walkRuleGraphN (buildRuleGraph rs) 0 [(1,start)]
---part2 = lightson 18
 
 
 lightson ::  Int -> [Rule] -> Int
-lightson n xs = numLights . head . drop n $ iterate (iteration nrules) start
+lightson n rs = numLights . head . drop n $ iterate (iteration rs) start
   where
-    nrules = concat [ zip (allChanges rule) (repeat result) |  (rule, result) <- xs]
     numLights = length . filter (==On) . concat
 
 iteration :: [Rule] -> Pattern -> Pattern
@@ -83,8 +80,8 @@ iteration rules = joinParts . map (snd . applyRule rules) . breakup
 
 applyRule :: [Rule] -> Pattern -> Rule
 applyRule rules xs = case find (\r -> any ((==) (fst r)) (allChanges xs) ) rules of
-                       Nothing -> error $ "Couldn't match " ++ show xs
-                       Just rule  -> rule
+                       Nothing   -> error $ "Couldn't match " ++ show xs
+                       Just rule -> rule
 
 joinParts :: [[[Light]]] -> Pattern
 joinParts xss = concat $ map createRow $ chunk size xss
