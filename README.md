@@ -8,12 +8,11 @@ not gather absolute data on.
 
     Slowest (in seconds):
 
-    - Day 15 5.4
-    - Day 25 5.4
-    - Day 22 5.2
-    - Day 24  1.7
+    - Day 15 10.1
+    - Day 25  9.3
+    - Day 22  7.3
+    - Day 24   2.9
     - All others finish under a second
 
 ![Criterion Benchmark Report](./benchmarks/criterion-report.png)
 
-(x-axis measured in milliseconds)
