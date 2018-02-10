@@ -2,6 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE Strict            #-}
 {-# LANGUAGE StrictData        #-}
+
 module Y2017.Day22 where
 
 import           Data.Text                  (Text)
@@ -14,8 +15,7 @@ import           Text.Megaparsec.Char
 import qualified Text.Megaparsec.Char.Lexer as L
 
 import           Data.List
-import qualified Data.Map.Strict            as M
-
+import qualified Data.HashMap.Strict            as M
 data Node = Clean | Weakened | Infect | Flagged deriving (Show, Eq)
 
 data Action = Cleaning | Infecting deriving (Show, Eq)
@@ -27,7 +27,7 @@ parta :: [[Node]] -> Int
 parta = foldl1' (+) . take (10^4) . walka . setup
 
 
-setup :: [[Node]] -> (Pos, M.Map (Int, Int) Node)
+setup :: [[Node]] -> (Pos, M.HashMap (Int, Int) Node)
 setup xs = (pos, board)
   where
     y = length xs `div` 2
@@ -38,8 +38,8 @@ setup xs = (pos, board)
 
 data Turn = TurnL | TurnR | Opposite | None
 
-walka :: (Pos, M.Map (Int, Int) Node) -> [Int]
-walka (Pos !p !d, !b) = case M.findWithDefault Clean p b of
+walka :: (Pos, M.HashMap (Int, Int) Node) -> [Int]
+walka (Pos !p !d, !b) = case M.lookupDefault Clean p b of
                           Clean  -> 1:walka (newpos p d TurnL, M.insert p Infect b)
                           Infect -> 0:walka (newpos p d TurnR, M.insert p Clean  b)
 
@@ -65,14 +65,19 @@ move (!x,!y) R = (x+1,y)
 
 
 partb :: [[Node]] -> Int
-partb = foldl1' (+) . take (10^7) . walkb . setup
+partb ns = let (pos, hmap) = setup ns
+           in partbwalk 0 0 pos hmap
 
-walkb :: (Pos, M.Map (Int, Int) Node) -> [Int]
-walkb (Pos !p !d, !b) = case M.findWithDefault Clean p b of
-                          Clean ->    0:walkb (newpos p d TurnL   , M.insert p Weakened b)
-                          Weakened -> 1:walkb (newpos p d None    , M.insert p Infect   b)
-                          Infect ->   0:walkb (newpos p d TurnR   , M.insert p Flagged  b)
-                          Flagged ->  0:walkb (newpos p d Opposite, M.insert p Clean    b)
+
+partbwalk :: Int -> Int -> Pos -> M.HashMap (Int, Int) Node -> Int
+partbwalk !n !i (Pos !p !d) m = if n == 10^7
+                                then i
+                                else
+                                  case M.lookupDefault Clean p m of
+                                    Clean ->    partbwalk (n+1) i     (newpos p d TurnL   ) (M.insert p Weakened m)
+                                    Weakened -> partbwalk (n+1) (i+1) (newpos p d None    ) (M.insert p Infect   m)
+                                    Infect ->   partbwalk (n+1) i     (newpos p d TurnR   ) (M.insert p Flagged  m)
+                                    Flagged ->  partbwalk (n+1) i     (newpos p d Opposite) (M.insert p Clean    m)
 
 
 type Parser = Parsec Void Text
