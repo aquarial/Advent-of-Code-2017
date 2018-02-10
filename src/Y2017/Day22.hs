@@ -1,20 +1,20 @@
+{-# LANGUAGE BangPatterns      #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE Strict #-}
-{-# LANGUAGE StrictData #-}
-{-# LANGUAGE BangPatterns #-}
+{-# LANGUAGE Strict            #-}
+{-# LANGUAGE StrictData        #-}
 module Y2017.Day22 where
 
-import           Data.Text             (Text)
-import qualified Data.Text             as T
-import qualified Data.Text.IO          as TIO
+import           Data.Text                  (Text)
+import qualified Data.Text                  as T
+import qualified Data.Text.IO               as TIO
 
 import           Data.Void
-import           Text.Megaparsec hiding (Pos)
+import           Text.Megaparsec            hiding (Pos)
 import           Text.Megaparsec.Char
-import qualified Text.Megaparsec.Char.Lexer  as L
+import qualified Text.Megaparsec.Char.Lexer as L
 
 import           Data.List
-import qualified Data.Map.Strict       as M
+import qualified Data.Map.Strict            as M
 
 data Node = Clean | Weakened | Infect | Flagged deriving (Show, Eq)
 
@@ -54,9 +54,9 @@ walkb (Pos !p !d, !b) = case M.findWithDefault Clean p b of
                           Flagged ->  0:walkb (newpos p d Opposite, M.insert p Clean    b)
 
 newpos :: (Int, Int) -> Dir -> Turn -> Pos
-newpos xy d TurnL =    Pos (move xy (turnleft  d)) (turnleft  d)
-newpos xy d TurnR =    Pos (move xy (turnright d)) (turnright d)
-newpos xy d None  =    Pos (move xy            d)             d
+newpos xy d TurnL    =    Pos (move xy (turnleft  d)) (turnleft  d)
+newpos xy d TurnR    =    Pos (move xy (turnright d)) (turnright d)
+newpos xy d None     =    Pos (move xy            d)             d
 newpos xy d Opposite = Pos (move xy (opposite  d))  (opposite d)
 
 turnleft :: Dir -> Dir
