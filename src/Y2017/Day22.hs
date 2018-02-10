@@ -26,9 +26,6 @@ data Pos = Pos !(Int,Int) !Dir deriving (Show, Eq)
 parta :: [[Node]] -> Int
 parta = foldl1' (+) . take (10^4) . walka . setup
 
-partb :: [[Node]] -> Int
-partb = foldl1' (+) . take (10^7) . walkb . setup
-
 
 setup :: [[Node]] -> (Pos, M.Map (Int, Int) Node)
 setup xs = (pos, board)
@@ -45,13 +42,6 @@ walka :: (Pos, M.Map (Int, Int) Node) -> [Int]
 walka (Pos !p !d, !b) = case M.findWithDefault Clean p b of
                           Clean  -> 1:walka (newpos p d TurnL, M.insert p Infect b)
                           Infect -> 0:walka (newpos p d TurnR, M.insert p Clean  b)
-
-walkb :: (Pos, M.Map (Int, Int) Node) -> [Int]
-walkb (Pos !p !d, !b) = case M.findWithDefault Clean p b of
-                          Clean ->    0:walkb (newpos p d TurnL   , M.insert p Weakened b)
-                          Weakened -> 1:walkb (newpos p d None    , M.insert p Infect   b)
-                          Infect ->   0:walkb (newpos p d TurnR   , M.insert p Flagged  b)
-                          Flagged ->  0:walkb (newpos p d Opposite, M.insert p Clean    b)
 
 newpos :: (Int, Int) -> Dir -> Turn -> Pos
 newpos xy d TurnL    =    Pos (move xy (turnleft  d)) (turnleft  d)
@@ -71,6 +61,19 @@ move (!x,!y) U = (x,y-1)
 move (!x,!y) D = (x,y+1)
 move (!x,!y) L = (x-1,y)
 move (!x,!y) R = (x+1,y)
+
+
+
+partb :: [[Node]] -> Int
+partb = foldl1' (+) . take (10^7) . walkb . setup
+
+walkb :: (Pos, M.Map (Int, Int) Node) -> [Int]
+walkb (Pos !p !d, !b) = case M.findWithDefault Clean p b of
+                          Clean ->    0:walkb (newpos p d TurnL   , M.insert p Weakened b)
+                          Weakened -> 1:walkb (newpos p d None    , M.insert p Infect   b)
+                          Infect ->   0:walkb (newpos p d TurnR   , M.insert p Flagged  b)
+                          Flagged ->  0:walkb (newpos p d Opposite, M.insert p Clean    b)
+
 
 type Parser = Parsec Void Text
 
