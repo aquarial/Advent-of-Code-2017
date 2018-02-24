@@ -14,8 +14,12 @@ import           Text.Megaparsec            hiding (Pos)
 import           Text.Megaparsec.Char
 import qualified Text.Megaparsec.Char.Lexer as L
 
+import qualified Data.HashMap.Strict        as M
 import           Data.List
-import qualified Data.HashMap.Strict            as M
+
+import qualified Data.HashTable.IO          as HT
+import qualified Data.HashTable.ST.Basic    as HashTable
+
 data Node = Clean | Weakened | Infect | Flagged deriving (Show, Eq)
 
 data Action = Cleaning | Infecting deriving (Show, Eq)
@@ -44,9 +48,9 @@ walka (Pos !p !d, !b) = case M.lookupDefault Clean p b of
                           Infect -> 0:walka (newpos p d TurnR, M.insert p Clean  b)
 
 newpos :: (Int, Int) -> Dir -> Turn -> Pos
-newpos xy d TurnL    =    Pos (move xy (turnleft  d)) (turnleft  d)
-newpos xy d TurnR    =    Pos (move xy (turnright d)) (turnright d)
-newpos xy d None     =    Pos (move xy            d)             d
+newpos xy d TurnL    = Pos (move xy (turnleft  d)) (turnleft  d)
+newpos xy d TurnR    = Pos (move xy (turnright d)) (turnright d)
+newpos xy d None     = Pos (move xy            d)             d
 newpos xy d Opposite = Pos (move xy (opposite  d))  (opposite d)
 
 turnleft :: Dir -> Dir
