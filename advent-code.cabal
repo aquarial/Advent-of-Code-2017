@@ -29,6 +29,7 @@ executable advent-code
                      , diagrams-svg
                      , digits
                      , hashable
+                     , hashtables
                      , hash-graph
                      , lens
                      , megaparsec == 6.3.0

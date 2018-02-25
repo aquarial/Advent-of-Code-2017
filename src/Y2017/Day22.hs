@@ -15,10 +15,10 @@ import           Text.Megaparsec.Char
 import qualified Text.Megaparsec.Char.Lexer as L
 
 import qualified Data.HashMap.Strict        as M
+import qualified Data.HashTable.IO          as HT
 import           Data.List
 
-import qualified Data.HashTable.IO          as HT
-import qualified Data.HashTable.ST.Basic    as HashTable
+import           Control.Monad              (foldM, when)
 
 data Node = Clean | Weakened | Infect | Flagged deriving (Show, Eq)
 
@@ -67,21 +67,37 @@ move (!x,!y) L = (x-1,y)
 move (!x,!y) R = (x+1,y)
 
 
+type HashTable k v = HT.BasicHashTable k v
 
-partb :: [[Node]] -> Int
+partb :: [[Node]] -> IO Int
 partb ns = let (pos, hmap) = setup ns
-           in partbwalk 0 0 pos hmap
+               tlist = M.toList hmap
+               ins m (k,v) = HT.insert m k v >> pure m
+               o h = foldM ins h []
+           in do h <- HT.new
+                 foldM ins h (M.toList hmap)
+                 partbwalk 0 0 pos h
 
 
-partbwalk :: Int -> Int -> Pos -> M.HashMap (Int, Int) Node -> Int
-partbwalk !n !i (Pos !p !d) m = if n == 10^7
-                                then i
-                                else
-                                  case M.lookupDefault Clean p m of
-                                    Clean ->    partbwalk (n+1) i     (newpos p d TurnL   ) (M.insert p Weakened m)
-                                    Weakened -> partbwalk (n+1) (i+1) (newpos p d None    ) (M.insert p Infect   m)
-                                    Infect ->   partbwalk (n+1) i     (newpos p d TurnR   ) (M.insert p Flagged  m)
-                                    Flagged ->  partbwalk (n+1) i     (newpos p d Opposite) (M.insert p Clean    m)
+partbwalk :: Int -> Int -> Pos -> HashTable (Int, Int) Node -> IO Int
+partbwalk !n !i (Pos !p !d) m =
+  if n == 10^7
+  then pure i
+  else do vmaybe <- HT.lookup m p
+          let nv = case vmaybe of
+                     Nothing       -> Weakened
+                     Just Clean    -> Weakened
+                     Just Weakened -> Infect
+                     Just Infect   -> Flagged
+                     Just Flagged  -> Clean
+          --when (n `mod` (10^5) == 0) $ print p
+          HT.insert m p nv
+          case vmaybe of
+            Nothing       -> partbwalk (n+1) i     (newpos p d TurnL   ) m
+            Just Clean    -> partbwalk (n+1) i     (newpos p d TurnL   ) m
+            Just Weakened -> partbwalk (n+1) (i+1) (newpos p d None    ) m
+            Just Infect   -> partbwalk (n+1) i     (newpos p d TurnR   ) m
+            Just Flagged  -> partbwalk (n+1) i     (newpos p d Opposite) m
 
 
 type Parser = Parsec Void Text
@@ -100,7 +116,7 @@ main = do
     Left err -> TIO.putStr $ T.pack $ parseErrorPretty err
     Right bi -> do
       tprint $ parta bi
-      tprint $ partb bi
+      partb bi >>= print
 
 tprint :: Show a => a -> IO ()
 tprint = TIO.putStrLn . T.pack . show
