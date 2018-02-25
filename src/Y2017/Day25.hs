@@ -16,18 +16,22 @@ import qualified Data.HashSet          as S
 import qualified Data.Graph            as G
 import qualified Data.Vector           as V
 
+parta :: (Char, Int, M.Map Char TurningInstr) -> Int
 parta (start,diag,instrs) = runturning start diag instrs 0 M.empty
 
+runturning :: Char -> Int -> M.Map Char TurningInstr -> Int -> M.Map Int Int -> Int
 runturning state 0    instrs pos tape = length $ filter (==1) $ M.elems tape
 runturning state diag instrs pos tape =
   let valfun = if M.findWithDefault 0 pos tape == 0 then _zero else _one
-      addDir L = subtract 1
-      addDir R = (+1)
   in case valfun <$> M.lookup state instrs of
        Nothing -> error $ concat ["Could not find state ",show state," in ",show instrs]
        Just (Action v d s) -> runturning s (diag-1) instrs (addDir d pos) (M.insert pos v tape)
 
 data Dir = L | R deriving (Show,Eq)
+
+addDir :: Dir -> Int -> Int
+addDir L = subtract 1
+addDir R = (+1)
 
 data Action = Action { _newval :: Int
                      , _move   :: Dir
