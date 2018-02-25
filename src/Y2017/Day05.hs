@@ -26,16 +26,16 @@ part1 vec = ST.runST $ do v <- V.thaw vec
 
 part2 :: Vector Int -> Int
 part2 vec = ST.runST $ do v0 <- V.thaw vec
-                          mwalk chang v0 0 0
+                          mwalk threeplus v0 0 0
   where
-    chang x = if x < 3 then x+1 else x-1
+    threeplus x = if x < 3 then x+1 else x-1
 
 mwalk :: (Int -> Int) -> MVector s Int -> Int -> Int -> ST.ST s Int
-mwalk dx v !i !acc = if MV.length v <= i
-                   then pure acc
-                   else do x <- MV.read v i
-                           MV.write v i (dx x)
-                           mwalk dx v (i+x) (acc+1)
+mwalk dx vec !i !acc = if MV.length vec <= i
+                       then pure acc
+                       else do x <- MV.read vec i
+                               MV.write vec i (dx x)
+                               mwalk dx vec (i+x) (acc+1)
 
 type Parser = Parsec Void Text
 
