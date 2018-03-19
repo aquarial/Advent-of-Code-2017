@@ -31,7 +31,7 @@ letterToMaybe _          = Nothing
 walk :: V.Vector (V.Vector Piece) -> (Int, Int) -> Dir -> [Piece]
 walk vec start startDir = walkToPlus start startDir
   where
-    inRange (x,y) = (0<=x)&&(0<=y)&&(x<V.length (vec V.! 0))&&(y<V.length vec)
+    inRange (x,y) = (0<=x)&&(0<=y)&&(y<V.length vec)&&(x<V.length (vec V.! y))
 
     valid p = inRange p && get vec p /= S
 
