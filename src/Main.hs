@@ -35,8 +35,8 @@ main = defaultMain [ bgroup "day #"
                    ]
 
 day :: Int -> [Char]
-day n | n <  10 = "0" ++ show n
-      | n >= 10 = show n
+day n | n < 10 = "0" ++ show n
+      | otherwise = show n
 
 allmains :: [IO ()]
 allmains = [ D01.main, D02.main, D03.main, D04.main, D05.main
