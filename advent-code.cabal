@@ -23,22 +23,16 @@ executable advent-of-code
                      , base64-bytestring
                      , bytestring
                      , containers
-                     , criterion >= 1.2
-                     , diagrams
-                     , diagrams-lib
-                     , diagrams-svg
-                     , digits
+                     , criterion
                      , hashable
                      , hashtables
                      , hash-graph
-                     , lens
-                     , megaparsec == 6.3.0
+                     , megaparsec
                      , split
                      , primes
                      , text
                      , unordered-containers
                      , vector
-                     , wreq
   other-modules:       Y2017.Day01
                        Y2017.Day02
                        Y2017.Day03
