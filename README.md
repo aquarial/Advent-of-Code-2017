@@ -15,6 +15,10 @@ Day 15 - 5.8
 Day 25 - 3.9
 Day 22 - 3.3
 Day 24 - 1.7
-All others in less than a second
+All other days finish in less than a second
 ```
+
+The x-axis is measured in milliseconds.
+
 ![Criterion Benchmark Report](./benchmarks/criterion-report.png)
+
